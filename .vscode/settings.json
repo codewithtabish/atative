@@ -1,0 +1,5 @@
+{
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "javascript.preferences.includePackageJsonAutoImports": "on",
+  "editor.suggest.showStatusBar": true
+}
