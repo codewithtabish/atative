@@ -12,8 +12,10 @@ const HomeScreen = () => {
     <Container>
         <SiteTopHeader/>
         <CategoryNavbar/>
-        <hr />
+        <div className='py-10'>
         <ModeToggle/>
+
+        </div>
        
     </Container>
  
