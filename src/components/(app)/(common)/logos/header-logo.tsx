@@ -9,17 +9,14 @@ type AtativeLogoProps = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  ATATIVE animated logo — fully responsive, works on all devices.    */
+/*  ATATIVE mark — geometric "A" + wordmark, scales fluidly.           */
 /*                                                                      */
-/*  - Geometric "A" mark + "ATATIVE" wordmark.                         */
-/*  - Scales fluidly with its container (width:100%, height:auto,      */
-/*    preserveAspectRatio) — no fixed px sizing anywhere.              */
-/*  - On mount: mark and wordmark animate in with a short stagger.     */
-/*  - Cool bubble animation: several small bubbles drift upward from   */
-/*    the accent point, fading and scaling as they rise, looping on    */
-/*    staggered delays so it never looks mechanical.                   */
-/*  - Respects prefers-reduced-motion: everything collapses to a       */
-/*    plain static render.                                             */
+/*  Motion is intentionally quiet: a single entrance stagger and one   */
+/*  slow breathing accent dot. The old rising-bubble trail was cut —   */
+/*  four looping particles fought for attention against the header's   */
+/*  new category ticker, and didn't mean anything for a publication    */
+/*  mark. One calm signal reads as considered; four reads as busy.     */
+/*  Respects prefers-reduced-motion (collapses to a static render).    */
 /* ------------------------------------------------------------------ */
 export function AtativeHeaderLogo({
   className,
@@ -32,37 +29,29 @@ export function AtativeHeaderLogo({
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: shouldReduceMotion ? 0 : 0.12,
+        staggerChildren: shouldReduceMotion ? 0 : 0.1,
         delayChildren: 0.05,
       },
     },
   };
 
   const markVariants: Variants = {
-    hidden: { opacity: 0, scale: shouldReduceMotion ? 1 : 0.92 },
+    hidden: { opacity: 0, scale: shouldReduceMotion ? 1 : 0.94 },
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { duration: shouldReduceMotion ? 0 : 0.5, ease: "easeOut" },
+      transition: { duration: shouldReduceMotion ? 0 : 0.45, ease: "easeOut" },
     },
   };
 
   const wordmarkVariants: Variants = {
-    hidden: { opacity: 0, x: shouldReduceMotion ? 0 : -8 },
+    hidden: { opacity: 0, x: shouldReduceMotion ? 0 : -6 },
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: shouldReduceMotion ? 0 : 0.5, ease: "easeOut" },
+      transition: { duration: shouldReduceMotion ? 0 : 0.45, ease: "easeOut" },
     },
   };
-
-  // Bubble config: each bubble rises, drifts sideways slightly, fades out.
-  const bubbles = [
-    { r: 3.2, dx: -6, delay: 0, duration: 3.2, rise: 46 },
-    { r: 2.2, dx: 4, delay: 0.9, duration: 2.6, rise: 38 },
-    { r: 1.6, dx: -2, delay: 1.7, duration: 3.0, rise: 34 },
-    { r: 2.6, dx: 7, delay: 2.4, duration: 3.4, rise: 42 },
-  ];
 
   return (
     <motion.svg
@@ -91,53 +80,28 @@ export function AtativeHeaderLogo({
           fillRule="evenodd"
         />
 
-        {/* Anchor bubble — gentle continuous breathing */}
+        {/* Single accent dot — a quiet, continuous "publishing" pulse. */}
         <motion.circle
           cx={50}
           cy={147}
-          r={7}
+          r={6}
           fill={color}
-          fillOpacity={0.35}
+          fillOpacity={0.4}
           animate={
             shouldReduceMotion
               ? undefined
               : {
-                  scale: [1, 1.25, 1],
-                  opacity: [0.35, 0.6, 0.35],
+                  scale: [1, 1.2, 1],
+                  opacity: [0.4, 0.65, 0.4],
                 }
           }
           transition={{
-            duration: 2.6,
+            duration: 2.8,
             repeat: shouldReduceMotion ? 0 : Infinity,
             ease: "easeInOut",
           }}
           style={{ transformOrigin: "50px 147px" }}
         />
-
-        {/* Rising bubble trail — small bubbles drifting up and fading out */}
-        {!shouldReduceMotion &&
-          bubbles.map((b, i) => (
-            <motion.circle
-              key={i}
-              cx={50}
-              cy={147}
-              r={b.r}
-              fill={color}
-              initial={{ opacity: 0, y: 0, x: 0, scale: 0.6 }}
-              animate={{
-                opacity: [0, 0.55, 0],
-                y: [0, -b.rise],
-                x: [0, b.dx],
-                scale: [0.6, 1, 0.8],
-              }}
-              transition={{
-                duration: b.duration,
-                delay: b.delay,
-                repeat: Infinity,
-                ease: "easeOut",
-              }}
-            />
-          ))}
       </motion.g>
 
       {showWordmark && (

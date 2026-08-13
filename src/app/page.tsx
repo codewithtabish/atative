@@ -1,24 +1,22 @@
+import { Container } from "@/components/(app)/(common)/layout/container";
+import SiteTopHeader from "@/components/(app)/(common)/navbars/top-navbar";
+import { ModeToggle } from "@/components/(app)/(common)/theme/mode-toggle";
+
 const HomeScreen = () => {
   return (
-    <div>
-      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Distinctio blanditiis magnam nemo
-      quia qui provident modi praesentium architecto minima nulla quibusdam temporibus, est fugiat
-      aperiam ullam enim, deserunt eius recusandae? Lorem ipsum dolor sit amet consectetur,
-      adipisicing elit. Distinctio blanditiis magnam nemo quia qui provident modi praesentium
-      architecto minima nulla quibusdam temporibus, est fugiat aperiam ullam enim, deserunt eius
-      recusandae? Lorem ipsum dolor sit amet consectetur, adipisicing elit. Distinctio blanditiis
-      magnam nemo quia qui provident modi praesentium architecto minima nulla quibusdam temporibus,
-      est fugiat aperiam ullam enim, deserunt eius recusandae?
+    <Container>
+      <SiteTopHeader />
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium molestiae reprehenderit
+        facere voluptate culpa dolorum, veritatis neque exercitationem inventore quo quod mollitia
+        sapiente eum saepe. Quis corporis quam blanditiis? Facilis. Lorem ipsum dolor sit amet
+        consectetur adipisicing elit. Laudantium molestiae reprehenderit facere voluptate culpa
+        dolorum, veritatis neque exercitationem inventore quo quod mollitia sapiente eum saepe. Quis
+        corporis quam blanditiis? Facilis.
+      </p>
       <hr />
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis fugiat doloremque
-      voluptates quibusdam consequatur rem impedit? Nulla, reiciendis animi sapiente earum, sit
-      culpa vero eligendi porro deleniti veritatis error debitis. Lorem ipsum dolor sit amet
-      consectetur adipisicing elit. Nostrum natus a quod repellat voluptatem minus sequi ea
-      cupiditate, minima doloribus nisi, magni neque enim. Ipsam amet labore accusamus architecto
-      molestiae? Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum natus a quod
-      repellat voluptatem minus sequi ea cupiditate, minima doloribus nisi, magni neque enim. Ipsam
-      amet labore accusamus architecto molestiae?
-    </div>
+      <ModeToggle />
+    </Container>
   );
 };
 

@@ -1,34 +1,31 @@
 "use client";
 
-import type { ComponentType } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { motion, type Variants, type Transition } from "framer-motion";
+import { motion, useReducedMotion, type Transition, type Variants } from "framer-motion";
 import { Mail, Menu } from "lucide-react";
+import { useSyncExternalStore, type ComponentType } from "react";
 
 import { cn } from "@/lib/utils";
-import { Container } from "../layout/container";
 import AtativeHeaderLogo from "../logos/header-logo";
 
 /* ------------------------------------------------------------------ */
-/*  Logo assets — confirmed from public/images/logos/ file listing     */
+/*  Brand accent — pulled from the logo mark's default color so the    */
+/*  ticker dots, hover states, and the mark itself read as one system. */
 /* ------------------------------------------------------------------ */
-const LOGO = {
-  desktopDark: "/images/logos/header_logo_desktop_light.png", // 1200×213
-  desktopLight: "/images/logos/header_logo_desktop_dark.png", // 1200×213
-  mobileLight: "/images/logos/header_logo_mobile_dark.png", // 800×142
-  mobileDark: "/images/logos/header_logo_mobile_light.png", // 800×142
-} as const;
+const ACCENT = "#829A88";
+
+/* ------------------------------------------------------------------ */
+/*  Sections — the real category set for the publication. This drives  */
+/*  the masthead ticker below, so it stays true if categories change.  */
+/* ------------------------------------------------------------------ */
+const SECTIONS = ["Ideas", "Trends", "Reviews", "Guides", "Insights", "Culture", "Technology"];
 
 /* ------------------------------------------------------------------ */
 /*  Social brand icons                                                 */
 /*                                                                      */
-/*  lucide-react (checked: v1.31, current as of this writing) no        */
-/*  longer ships brand/logo icons — Instagram, Facebook, YouTube, and   */
-/*  Twitter/X were all removed, presumably over trademark concerns.     */
-/*  If your installed version differs and still has them, feel free     */
-/*  to swap these for the lucide imports instead. These are minimal     */
-/*  monoline glyphs sized to match lucide's 24×24 / stroke proportions. */
+/*  lucide-react no longer ships brand/logo glyphs (Instagram,          */
+/*  Facebook, YouTube, X were removed over trademark concerns), so      */
+/*  these are minimal monoline glyphs sized to match lucide's 24×24 /   */
+/*  stroke proportions.                                                 */
 /* ------------------------------------------------------------------ */
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -119,15 +116,6 @@ const headerVariants: Variants = {
   },
 };
 
-const logoVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.94 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.45, ease: "easeOut", delay: 0.05 },
-  },
-};
-
 const actionsContainerVariants: Variants = {
   hidden: {},
   visible: {
@@ -145,9 +133,92 @@ const actionItemVariants: Variants = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Shared icon-button — used for social links, Newsletter, and Menu   */
-/*  so all three read as one consistent "utility action" family.       */
-/*  Sized up slightly (h-10 w-10, icon h-[18px]) for more presence.    */
+/*  Masthead strip — a real newspaper convention, used for real        */
+/*  reasons: the date grounds the page as a living publication, and    */
+/*  the ticker surfaces the actual section set before anyone opens     */
+/*  the menu. Both are true facts about the site, not decoration.      */
+/* ------------------------------------------------------------------ */
+function formatMastheadDate() {
+  return new Date()
+    .toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    })
+    .toUpperCase();
+}
+
+// No external source ever pushes an update, so the subscribe function is a
+// no-op — this is just useSyncExternalStore's supported way of saying
+// "this value only exists on the client," without the effect+setState
+// pattern that causes an extra render pass on mount.
+function subscribeToNothing() {
+  return () => {};
+}
+
+function getServerDateSnapshot() {
+  return null;
+}
+
+function MastheadDate() {
+  // Server snapshot is null (avoids a timezone-driven hydration mismatch,
+  // since the server may format in a different zone than the browser);
+  // the client snapshot resolves on first client render, no effect needed.
+  const formatted = useSyncExternalStore(
+    subscribeToNothing,
+    formatMastheadDate,
+    getServerDateSnapshot,
+  );
+
+  // Reserves the space with a non-breaking space until the client value
+  // is available, so the strip doesn't jump on hydration.
+  return <span className="tabular-nums">{formatted ?? "\u00A0"}</span>;
+}
+
+function SectionTicker() {
+  const shouldReduceMotion = useReducedMotion();
+  const track = [...SECTIONS, ...SECTIONS];
+
+  const tickerTransition: Transition = {
+    duration: 26,
+    repeat: Infinity,
+    ease: "linear",
+  };
+
+  return (
+    <div
+      aria-hidden="true"
+      className="group relative hidden h-full flex-1 items-center overflow-hidden md:flex"
+      style={{
+        maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+        WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+      }}
+    >
+      <motion.div
+        className="flex shrink-0 items-center gap-8 pr-8"
+        animate={shouldReduceMotion ? undefined : { x: ["0%", "-50%"] }}
+        transition={tickerTransition}
+        style={{ willChange: "transform" }}
+        whileHover={shouldReduceMotion ? undefined : { transition: { duration: 0 } }}
+      >
+        {track.map((section, i) => (
+          <span key={`${section}-${i}`} className="flex items-center gap-8 whitespace-nowrap">
+            <span className="text-[11px] font-medium uppercase tracking-[0.16em]">{section}</span>
+            <span
+              aria-hidden="true"
+              className="h-1 w-1 rounded-full"
+              style={{ backgroundColor: ACCENT }}
+            />
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Shared icon-button — used for social links and the menu trigger,   */
+/*  so both read as one consistent "utility action" family.            */
 /* ------------------------------------------------------------------ */
 type HeaderActionButtonProps = {
   label: string;
@@ -204,8 +275,38 @@ function HeaderActionButton(props: HeaderActionButtonProps) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Shared vertical separator — used between the social-icon group     */
-/*  and the newsletter/menu group, and again between newsletter/menu.  */
+/*  Subscribe — the one action a publication header should make        */
+/*  impossible to miss, so it gets its own pill rather than sharing    */
+/*  the quiet icon-button treatment used for secondary utilities.       */
+/* ------------------------------------------------------------------ */
+function SubscribeButton() {
+  return (
+    <>
+      <motion.a
+        href="#subscribe"
+        variants={actionItemVariants}
+        whileHover={{ y: -1 }}
+        whileTap={{ scale: 0.97 }}
+        className={cn(
+          "hidden items-center gap-2 rounded-full border border-foreground px-4 py-2",
+          "text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground",
+          "transition-colors duration-200 hover:bg-foreground hover:text-background",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+          "sm:inline-flex",
+        )}
+      >
+        <Mail className="h-3.5 w-3.5" />
+        Subscribe
+      </motion.a>
+
+      {/* Compact icon-only version for the narrowest screens. */}
+      <HeaderActionButton as="button" label="Subscribe" icon={Mail} />
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Shared vertical separator                                          */
 /* ------------------------------------------------------------------ */
 function ActionSeparator({ desktopOnly = false }: { desktopOnly?: boolean }) {
   return (
@@ -218,24 +319,40 @@ function ActionSeparator({ desktopOnly = false }: { desktopOnly?: boolean }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Site header — first / top row only.                                */
+/*  Site header — masthead strip + primary row.                        */
 /*  The category navigation row is intentionally not included here.    */
 /* ------------------------------------------------------------------ */
 export default function SiteTopHeader() {
   return (
     <header>
+      {/* Masthead strip — date + live section ticker. Flips with theme:
+          bg-foreground/text-background means it's dark-on-light in light
+          mode and light-on-dark in dark mode, so it never needs a
+          hardcoded color of its own. */}
+      <div className="hidden h-9 items-center gap-6 bg-foreground px-4 text-background sm:flex sm:px-6 lg:px-8">
+        <MastheadDate />
+        <SectionTicker />
+        <a
+          href="#subscribe"
+          className="shrink-0 text-[11px] font-medium uppercase tracking-[0.16em] underline-offset-4 hover:underline"
+        >
+          Subscribe
+        </a>
+      </div>
+
       <motion.div
         className="w-full border-b border-border/60"
         variants={headerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* <Container> */}
-        <div className="flex h-16 items-center justify-between gap-4 md:h-20 lg:h-24">
+        <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 md:h-20 lg:h-24 lg:px-8">
           {/* ---------------------------------------------------- */}
           {/* Logo                                                  */}
           {/* ---------------------------------------------------- */}
-          <AtativeHeaderLogo />
+          <div className="w-40 sm:w-48 md:w-56">
+            <AtativeHeaderLogo />
+          </div>
 
           {/* ---------------------------------------------------- */}
           {/* Actions                                               */}
@@ -259,13 +376,13 @@ export default function SiteTopHeader() {
               ))}
             </div>
 
-            {/* Separator — between social icons and newsletter/menu group, desktop only */}
+            {/* Separator — between social icons and subscribe/menu group */}
             <ActionSeparator desktopOnly />
 
-            {/* Newsletter — always visible */}
-            <HeaderActionButton as="button" label="Newsletter" icon={Mail} />
+            {/* Subscribe — always visible, in one of two forms */}
+            <SubscribeButton />
 
-            {/* Separator — between newsletter and menu, always visible */}
+            {/* Separator — between subscribe and menu, always visible */}
             <ActionSeparator />
 
             {/* Menu trigger — always visible. Drawer/sheet wiring is
@@ -274,7 +391,6 @@ export default function SiteTopHeader() {
             <HeaderActionButton as="button" label="Open menu" icon={Menu} />
           </motion.div>
         </div>
-        {/* </Container> */}
       </motion.div>
     </header>
   );
