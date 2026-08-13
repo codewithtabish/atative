@@ -1,5 +1,6 @@
 "use client";
 
+import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { motion, useReducedMotion, type Transition, type Variants } from "framer-motion";
 import { Mail, Menu } from "lucide-react";
 import { useSyncExternalStore, type ComponentType } from "react";
@@ -8,24 +9,17 @@ import { cn } from "@/lib/utils";
 import AtativeHeaderLogo from "../logos/header-logo";
 
 /* ------------------------------------------------------------------ */
-/*  Brand accent — pulled from the logo mark's default color so the    */
-/*  ticker dots, hover states, and the mark itself read as one system. */
+/*  Brand accent — matches --primary (sage) from your theme            */
 /* ------------------------------------------------------------------ */
 const ACCENT = "#829A88";
 
 /* ------------------------------------------------------------------ */
-/*  Sections — the real category set for the publication. This drives  */
-/*  the masthead ticker below, so it stays true if categories change.  */
+/*  Sections                                                           */
 /* ------------------------------------------------------------------ */
 const SECTIONS = ["Ideas", "Trends", "Reviews", "Guides", "Insights", "Culture", "Technology"];
 
 /* ------------------------------------------------------------------ */
 /*  Social brand icons                                                 */
-/*                                                                      */
-/*  lucide-react no longer ships brand/logo glyphs (Instagram,          */
-/*  Facebook, YouTube, X were removed over trademark concerns), so      */
-/*  these are minimal monoline glyphs sized to match lucide's 24×24 /   */
-/*  stroke proportions.                                                 */
 /* ------------------------------------------------------------------ */
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -88,8 +82,7 @@ function XIcon({ className }: { className?: string }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Social links — data array, mapped below (no duplicated markup)     */
-/*  ⚠️ Replace hrefs with your real ATATIVE social URLs.                */
+/*  Social links                                                       */
 /* ------------------------------------------------------------------ */
 type SocialLink = {
   label: string;
@@ -108,35 +101,32 @@ const SOCIAL_LINKS: SocialLink[] = [
 /*  Framer Motion variants                                             */
 /* ------------------------------------------------------------------ */
 const headerVariants: Variants = {
-  hidden: { y: -24, opacity: 0 },
+  hidden: { y: -20, opacity: 0 },
   visible: {
     y: 0,
     opacity: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const actionsContainerVariants: Variants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.15 },
+    transition: { staggerChildren: 0.05, delayChildren: 0.12 },
   },
 };
 
 const actionItemVariants: Variants = {
-  hidden: { opacity: 0, y: -8 },
+  hidden: { opacity: 0, y: -6 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.35, ease: "easeOut" },
+    transition: { duration: 0.32, ease: "easeOut" },
   },
 };
 
 /* ------------------------------------------------------------------ */
-/*  Masthead strip — a real newspaper convention, used for real        */
-/*  reasons: the date grounds the page as a living publication, and    */
-/*  the ticker surfaces the actual section set before anyone opens     */
-/*  the menu. Both are true facts about the site, not decoration.      */
+/*  Masthead                                                           */
 /* ------------------------------------------------------------------ */
 function formatMastheadDate() {
   return new Date()
@@ -148,10 +138,6 @@ function formatMastheadDate() {
     .toUpperCase();
 }
 
-// No external source ever pushes an update, so the subscribe function is a
-// no-op — this is just useSyncExternalStore's supported way of saying
-// "this value only exists on the client," without the effect+setState
-// pattern that causes an extra render pass on mount.
 function subscribeToNothing() {
   return () => {};
 }
@@ -161,18 +147,13 @@ function getServerDateSnapshot() {
 }
 
 function MastheadDate() {
-  // Server snapshot is null (avoids a timezone-driven hydration mismatch,
-  // since the server may format in a different zone than the browser);
-  // the client snapshot resolves on first client render, no effect needed.
   const formatted = useSyncExternalStore(
     subscribeToNothing,
     formatMastheadDate,
     getServerDateSnapshot,
   );
 
-  // Reserves the space with a non-breaking space until the client value
-  // is available, so the strip doesn't jump on hydration.
-  return <span className="tabular-nums">{formatted ?? "\u00A0"}</span>;
+  return <span className="tabular-nums tracking-[0.04em]">{formatted ?? "\u00A0"}</span>;
 }
 
 function SectionTicker() {
@@ -180,7 +161,7 @@ function SectionTicker() {
   const track = [...SECTIONS, ...SECTIONS];
 
   const tickerTransition: Transition = {
-    duration: 26,
+    duration: 28,
     repeat: Infinity,
     ease: "linear",
   };
@@ -190,23 +171,25 @@ function SectionTicker() {
       aria-hidden="true"
       className="group relative hidden h-full flex-1 items-center overflow-hidden md:flex"
       style={{
-        maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
-        WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+        maskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
+        WebkitMaskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)",
       }}
     >
       <motion.div
-        className="flex shrink-0 items-center gap-8 pr-8"
+        className="flex shrink-0 items-center gap-7 pr-7"
         animate={shouldReduceMotion ? undefined : { x: ["0%", "-50%"] }}
         transition={tickerTransition}
         style={{ willChange: "transform" }}
         whileHover={shouldReduceMotion ? undefined : { transition: { duration: 0 } }}
       >
         {track.map((section, i) => (
-          <span key={`${section}-${i}`} className="flex items-center gap-8 whitespace-nowrap">
-            <span className="text-[11px] font-medium uppercase tracking-[0.16em]">{section}</span>
+          <span key={`${section}-${i}`} className="flex items-center gap-7 whitespace-nowrap">
+            <span className="text-[10.5px] font-medium uppercase tracking-[0.18em] opacity-90">
+              {section}
+            </span>
             <span
               aria-hidden="true"
-              className="h-1 w-1 rounded-full"
+              className="h-[3px] w-[3px] rounded-full opacity-80"
               style={{ backgroundColor: ACCENT }}
             />
           </span>
@@ -217,8 +200,7 @@ function SectionTicker() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Shared icon-button — used for social links and the menu trigger,   */
-/*  so both read as one consistent "utility action" family.            */
+/*  Shared icon-button                                                 */
 /* ------------------------------------------------------------------ */
 type HeaderActionButtonProps = {
   label: string;
@@ -231,19 +213,18 @@ function HeaderActionButton(props: HeaderActionButtonProps) {
   const { label, icon: Icon } = props;
 
   const className = cn(
-    "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-none",
-    "border-b border-border/70 text-foreground/70",
-    "transition-colors duration-200",
-    "hover:border-border hover:bg-accent/40 hover:text-foreground",
+    "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-none",
+    "text-foreground/65 transition-colors duration-200",
+    "hover:bg-accent/50 hover:text-foreground",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   );
 
-  const hoverTransition: Transition = { duration: 0.2, ease: "easeOut" };
+  const hoverTransition: Transition = { duration: 0.18, ease: "easeOut" };
 
   const motionProps = {
     variants: actionItemVariants,
-    whileHover: { scale: 1.08, transition: hoverTransition },
-    whileTap: { scale: 0.92 },
+    whileHover: { scale: 1.06, transition: hoverTransition },
+    whileTap: { scale: 0.94 },
   };
 
   if (props.as === "a") {
@@ -256,7 +237,7 @@ function HeaderActionButton(props: HeaderActionButtonProps) {
         className={className}
         {...motionProps}
       >
-        <Icon className="h-[22px] w-[22px]" />
+        <Icon className="h-[20px] w-[20px]" />
       </motion.a>
     );
   }
@@ -269,38 +250,79 @@ function HeaderActionButton(props: HeaderActionButtonProps) {
       className={className}
       {...motionProps}
     >
-      <Icon className="h-[22px] w-[22px]" />
+      <Icon className="h-[20px] w-[20px]" />
     </motion.button>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  Subscribe — the one action a publication header should make        */
-/*  impossible to miss, so it gets its own pill rather than sharing    */
-/*  the quiet icon-button treatment used for secondary utilities.       */
+/*  Shared pill button styles (Subscribe + Sign in)                    */
+/*  Hover → primary in both light & dark mode                          */
+/* ------------------------------------------------------------------ */
+const pillButtonClass = cn(
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-full",
+  "border border-foreground/80 bg-transparent",
+  "text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground whitespace-nowrap",
+  "transition-all duration-200",
+  "hover:border-primary hover:bg-primary hover:text-primary-foreground",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+);
+
+/* ------------------------------------------------------------------ */
+/*  Subscribe — hidden on small screens                                */
 /* ------------------------------------------------------------------ */
 function SubscribeButton() {
   return (
-    <>
-      <motion.a
-        href="#subscribe"
-        variants={actionItemVariants}
-        whileHover={{ y: -1 }}
-        whileTap={{ scale: 0.97 }}
-        className={cn(
-          "hidden items-center gap-2 rounded-full border border-foreground px-4 py-2",
-          "text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground",
-          "transition-colors duration-200 hover:bg-foreground hover:text-background",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-          "sm:inline-flex",
-        )}
-      >
-        <Mail className="h-3.5 w-3.5" />
-        Subscribe
-      </motion.a>
+    <motion.a
+      href="#subscribe"
+      variants={actionItemVariants}
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.97 }}
+      className={cn(pillButtonClass, "hidden px-4 py-2 sm:inline-flex")}
+    >
+      <Mail className="h-3.5 w-3.5 opacity-80" />
+      Subscribe
+    </motion.a>
+  );
+}
 
-      {/* Compact icon-only version for the narrowest screens. */}
-      <HeaderActionButton as="button" label="Subscribe" icon={Mail} />
+/* ------------------------------------------------------------------ */
+/*  Auth — Sign in + UserButton                                        */
+/* ------------------------------------------------------------------ */
+function AuthActions() {
+  return (
+    <>
+      <Show when="signed-out">
+        <SignInButton mode="modal">
+          <motion.button
+            type="button"
+            variants={actionItemVariants}
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            className={cn(pillButtonClass, "px-3.5 py-2 sm:px-4")}
+          >
+            Sign in
+          </motion.button>
+        </SignInButton>
+      </Show>
+
+      <Show when="signed-in">
+        <motion.div variants={actionItemVariants} className="flex items-center">
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox:
+                  "h-9 w-9 ring-1 ring-border hover:ring-primary/40 transition-shadow duration-200",
+                userButtonPopoverCard:
+                  "shadow-lg border border-border bg-popover text-popover-foreground",
+                userButtonPopoverActionButton: "hover:bg-accent",
+                userButtonPopoverActionButtonText: "text-foreground",
+                userButtonPopoverFooter: "hidden",
+              },
+            }}
+          />
+        </motion.div>
+      </Show>
     </>
   );
 }
@@ -313,58 +335,51 @@ function ActionSeparator({ desktopOnly = false }: { desktopOnly?: boolean }) {
     <motion.span
       aria-hidden="true"
       variants={actionItemVariants}
-      className={cn("h-6 w-px bg-border", desktopOnly ? "hidden lg:block" : "block")}
+      className={cn("h-5 w-px bg-border/80", desktopOnly ? "hidden lg:block" : "hidden sm:block")}
     />
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  Site header — masthead strip + primary row.                        */
-/*  The category navigation row is intentionally not included here.    */
+/*  Site header                                                        */
 /* ------------------------------------------------------------------ */
 export default function SiteTopHeader() {
   return (
-    <header>
-      {/* Masthead strip — date + live section ticker. Flips with theme:
-          bg-foreground/text-background means it's dark-on-light in light
-          mode and light-on-dark in dark mode, so it never needs a
-          hardcoded color of its own. */}
+    <header className="relative z-40">
+      {/* Masthead strip — inverted so it always contrasts with the page */}
       <div className="hidden h-9 items-center gap-6 bg-foreground px-4 text-background sm:flex sm:px-6 lg:px-8">
         <MastheadDate />
         <SectionTicker />
         <a
           href="#subscribe"
-          className="shrink-0 text-[11px] font-medium uppercase tracking-[0.16em] underline-offset-4 hover:underline"
+          className="shrink-0 text-[10.5px] font-medium uppercase tracking-[0.16em] opacity-90 underline-offset-4 transition-opacity hover:opacity-100 hover:underline"
         >
           Subscribe
         </a>
       </div>
 
+      {/* Primary header row */}
       <motion.div
-        className="w-full border-b border-border/60"
+        className="w-full border-b border-border/50 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
         variants={headerVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 md:h-20 lg:h-24 lg:px-8">
-          {/* ---------------------------------------------------- */}
-          {/* Logo                                                  */}
-          {/* ---------------------------------------------------- */}
-          <div className="w-40 sm:w-48 md:w-56">
+        <div className="flex h-16 items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6 md:h-[4.5rem] lg:h-20 lg:px-8">
+          {/* Logo */}
+          <div className="min-w-0 w-36 sm:w-48 md:w-52 lg:w-56">
             <AtativeHeaderLogo />
           </div>
 
-          {/* ---------------------------------------------------- */}
-          {/* Actions                                               */}
-          {/* ---------------------------------------------------- */}
+          {/* Actions */}
           <motion.div
-            className="flex items-center gap-3"
+            className="flex shrink-0 items-center gap-1.5 sm:gap-2.5"
             variants={actionsContainerVariants}
             initial="hidden"
             animate="visible"
           >
-            {/* Social links — desktop only */}
-            <div className="hidden items-center gap-3 lg:flex">
+            {/* Socials — large screens only */}
+            <div className="hidden items-center gap-0.5 lg:flex">
               {SOCIAL_LINKS.map((social) => (
                 <HeaderActionButton
                   key={social.label}
@@ -376,18 +391,19 @@ export default function SiteTopHeader() {
               ))}
             </div>
 
-            {/* Separator — between social icons and subscribe/menu group */}
             <ActionSeparator desktopOnly />
 
-            {/* Subscribe — always visible, in one of two forms */}
+            {/* Subscribe — hidden on mobile */}
             <SubscribeButton />
 
-            {/* Separator — between subscribe and menu, always visible */}
             <ActionSeparator />
 
-            {/* Menu trigger — always visible. Drawer/sheet wiring is
-                  intentionally left out; hook onClick up when that
-                  component exists. */}
+            {/* Auth */}
+            <AuthActions />
+
+            <ActionSeparator />
+
+            {/* Menu */}
             <HeaderActionButton as="button" label="Open menu" icon={Menu} />
           </motion.div>
         </div>

@@ -1,7 +1,8 @@
+import { ThemeProvider } from "@/components/(app)/(common)/theme/theme-provider";
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "@/components/(app)/(common)/theme/theme-provider";
 
+import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 
 const fontSans = Geist({
@@ -160,14 +161,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <ClerkProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

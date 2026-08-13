@@ -1,6 +1,7 @@
 import { Container } from "@/components/(app)/(common)/layout/container";
 import SiteTopHeader from "@/components/(app)/(common)/navbars/top-navbar";
 import { ModeToggle } from "@/components/(app)/(common)/theme/mode-toggle";
+import { Button } from "@/components/ui/button";
 
 const HomeScreen = () => {
   return (
@@ -16,6 +17,8 @@ const HomeScreen = () => {
       </p>
       <hr />
       <ModeToggle />
+      <hr />
+      <Button>Checks</Button>
     </Container>
   );
 };
