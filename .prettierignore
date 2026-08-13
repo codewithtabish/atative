@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Next.js generated files
+.next/
+out/
+
+# Build output
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# Vercel
+.vercel/
+
+# Turborepo cache
+.turbo/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Generated files
+*.min.js
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Public assets
+public/

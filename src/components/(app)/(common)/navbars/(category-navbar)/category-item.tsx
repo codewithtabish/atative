@@ -33,6 +33,21 @@ export function CategoryItem({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const hasSubcategories = category.subcategories.length > 0;
 
+  const labelClassName = cn(
+    "relative py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors duration-200",
+    isActive ? "text-primary" : "text-muted-foreground hover:text-foreground",
+  );
+
+  const underline = (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute inset-x-0 -bottom-px h-px origin-left bg-primary transition-transform duration-200 ease-out",
+        isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
+      )}
+    />
+  );
+
   return (
     <div
       ref={itemRef}
@@ -40,49 +55,37 @@ export function CategoryItem({
       onMouseEnter={() => hasSubcategories && onOpen()}
       onMouseLeave={() => hasSubcategories && onScheduleClose()}
     >
-      <div className="flex items-center gap-0.5">
-        {/* Category link — real, crawlable <Link>, not a click handler */}
+      {hasSubcategories ? (
+        // Category with subcategories: a button that only toggles the
+        // dropdown. It never navigates — the category itself has no page
+        // of its own here, only its subcategories do.
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-haspopup="true"
+          aria-expanded={isOpen}
+          aria-controls={dropdownId}
+          onClick={() => (isOpen ? onClose() : onOpen())}
+          className={cn(labelClassName, "flex items-center gap-2")}
+        >
+          {category.name}
+          <ChevronDown
+            className={cn("h-3 w-3 transition-transform duration-200", isOpen && "rotate-180")}
+          />
+          {underline}
+        </button>
+      ) : (
+        // Fallback for a category with no subcategories at all — nothing to
+        // toggle open, so this is the one case where it stays a real link.
         <Link
           href={`/${category.slug}`}
           aria-current={isActive ? "page" : undefined}
-          className={cn(
-            "relative py-2 text-[13px] font-semibold uppercase tracking-wide transition-colors duration-200",
-            isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
-          )}
+          className={labelClassName}
         >
           {category.name}
-          {/* Underline indicator — active is permanent, hover animates 0% -> 100% */}
-          <span
-            aria-hidden="true"
-            className={cn(
-              "pointer-events-none absolute inset-x-0 -bottom-px h-px origin-left bg-primary transition-transform duration-200 ease-out",
-              isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-            )}
-          />
+          {underline}
         </Link>
-
-        {/* Dropdown trigger — sibling of the Link, never nested inside it */}
-        {hasSubcategories && (
-          <button
-            ref={triggerRef}
-            type="button"
-            aria-haspopup="true"
-            aria-expanded={isOpen}
-            aria-controls={dropdownId}
-            aria-label={`${category.name} submenu`}
-            onClick={() => (isOpen ? onClose() : onOpen())}
-            className={cn(
-              "rounded-sm p-1 transition-colors duration-200",
-              "text-muted-foreground/70 hover:text-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            )}
-          >
-            <ChevronDown
-              className={cn("h-3 w-3 transition-transform duration-200", isOpen && "rotate-180")}
-            />
-          </button>
-        )}
-      </div>
+      )}
 
       {hasSubcategories && (
         <CategoryDropdown

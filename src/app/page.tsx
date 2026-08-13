@@ -1,25 +1,20 @@
-import dynamic from 'next/dynamic';
-import { Container } from '@/components/(app)/(common)/layout/container'
-import { Button } from '@/components/ui/button'
-import React from 'react'
-import { ModeToggle } from '@/components/(app)/(common)/theme/mode-toggle';
-import SiteTopHeader from '@/components/(app)/(common)/navbars/top-navbar';
-import CategoryNavbar from '@/components/(app)/(common)/navbars/(category-navbar)/category-navbar';
-
-
 const HomeScreen = () => {
   return (
-    <Container>
-        <SiteTopHeader/>
-        <CategoryNavbar/>
-        <div className='py-10'>
-        <ModeToggle/>
+    <div>
+      Lorem ipsum dolor sit amet consectetur, adipisicing elit. Distinctio blanditiis magnam nemo
+      quia qui provident modi praesentium architecto minima nulla quibusdam temporibus, est fugiat
+      aperiam ullam enim, deserunt eius recusandae? Lorem ipsum dolor sit amet consectetur,
+      adipisicing elit. Distinctio blanditiis magnam nemo quia qui provident modi praesentium
+      architecto minima nulla quibusdam temporibus, est fugiat aperiam ullam enim, deserunt eius
+      recusandae? Lorem ipsum dolor sit amet consectetur, adipisicing elit. Distinctio blanditiis
+      magnam nemo quia qui provident modi praesentium architecto minima nulla quibusdam temporibus,
+      est fugiat aperiam ullam enim, deserunt eius recusandae?
+      <hr />
+      Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis fugiat doloremque
+      voluptates quibusdam consequatur rem impedit? Nulla, reiciendis animi sapiente earum, sit
+      culpa vero eligendi porro deleniti veritatis error debitis.
+    </div>
+  );
+};
 
-        </div>
-       
-    </Container>
- 
-  )
-}
-
-export default HomeScreen
+export default HomeScreen;

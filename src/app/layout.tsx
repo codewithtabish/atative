@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/(app)/(common)/theme/theme-provider";
-import { Lora, Source_Code_Pro } from "next/font/google";
-import { GradientBackground } from "@/components/(app)/(common)/theme/gradient-background";
 
+import { Geist, Geist_Mono, Lora } from "next/font/google";
 
-
-const fontSans = Lora({
+const fontSans = Geist({
   subsets: ["latin"],
   variable: "--font-sans",
 });
@@ -16,11 +14,10 @@ const fontSerif = Lora({
   variable: "--font-serif",
 });
 
-const fontMono = Source_Code_Pro({
+const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 });
-
 
 const siteUrl = "https://atative.com";
 
@@ -148,17 +145,9 @@ const jsonLd = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      // className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -168,14 +157,15 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}>
+      <body
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {/* <GradientBackground/> */}
           {children}
         </ThemeProvider>
       </body>

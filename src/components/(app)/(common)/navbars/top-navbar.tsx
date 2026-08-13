@@ -8,6 +8,7 @@ import { Mail, Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Container } from "../layout/container";
+import AtativeHeaderLogo from "../logos/header-logo";
 
 /* ------------------------------------------------------------------ */
 /*  Logo assets — confirmed from public/images/logos/ file listing     */
@@ -31,7 +32,14 @@ const LOGO = {
 /* ------------------------------------------------------------------ */
 function InstagramIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      className={className}
+      aria-hidden="true"
+    >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4.2" />
       <circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" stroke="none" />
@@ -41,7 +49,16 @@ function InstagramIcon({ className }: { className?: string }) {
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
       <path d="M14.5 21v-7.2h2.4l.4-2.8h-2.8V9.2c0-.8.2-1.4 1.4-1.4h1.5V5.3c-.3 0-1.1-.1-2.1-.1-2.1 0-3.5 1.3-3.5 3.6v2.1H9.4v2.8h2.4V21" />
     </svg>
   );
@@ -49,7 +66,16 @@ function FacebookIcon({ className }: { className?: string }) {
 
 function YoutubeIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
       <rect x="2.5" y="6" width="19" height="12" rx="3.5" />
       <path d="M10.7 9.6v4.8l4.3-2.4-4.3-2.4Z" fill="currentColor" stroke="none" />
     </svg>
@@ -127,19 +153,18 @@ type HeaderActionButtonProps = {
   label: string;
   icon: ComponentType<{ className?: string }>;
 } & (
-  | { as: "a"; href: string; onClick?: never }
-  | { as?: "button"; href?: never; onClick?: () => void }
+  { as: "a"; href: string; onClick?: never } | { as?: "button"; href?: never; onClick?: () => void }
 );
 
 function HeaderActionButton(props: HeaderActionButtonProps) {
   const { label, icon: Icon } = props;
 
   const className = cn(
-    "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-none",
+    "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-none",
     "border-b border-border/70 text-foreground/70",
     "transition-colors duration-200",
     "hover:border-border hover:bg-accent/40 hover:text-foreground",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   );
 
   const hoverTransition: Transition = { duration: 0.2, ease: "easeOut" };
@@ -160,7 +185,7 @@ function HeaderActionButton(props: HeaderActionButtonProps) {
         className={className}
         {...motionProps}
       >
-        <Icon className="h-[18px] w-[18px]" />
+        <Icon className="h-[22px] w-[22px]" />
       </motion.a>
     );
   }
@@ -173,7 +198,7 @@ function HeaderActionButton(props: HeaderActionButtonProps) {
       className={className}
       {...motionProps}
     >
-      <Icon className="h-[18px] w-[18px]" />
+      <Icon className="h-[22px] w-[22px]" />
     </motion.button>
   );
 }
@@ -200,98 +225,56 @@ export default function SiteTopHeader() {
   return (
     <header>
       <motion.div
-        className="w-full border-b border-border/60 bg-background"
+        className="w-full border-b border-border/60"
         variants={headerVariants}
         initial="hidden"
         animate="visible"
       >
-        <Container>
-          <div className="flex h-16 items-center justify-between gap-4 md:h-20 lg:h-24">
-            {/* ---------------------------------------------------- */}
-            {/* Logo                                                  */}
-            {/* ---------------------------------------------------- */}
-            <motion.div variants={logoVariants} initial="hidden" animate="visible" className="shrink-0">
-              <Link href="/" aria-label="ATATIVE — Home" className="shrink-0">
-                {/* Desktop lockup (lg and above) */}
-                <span className="hidden lg:block">
-                  <Image
-                    src={LOGO.desktopLight}
-                    alt="ATATIVE"
-                    width={1200}
-                    height={213}
-                    priority
-                    className="block h-10 w-auto dark:hidden xl:h-12"
-                  />
-                  <Image
-                    src={LOGO.desktopDark}
-                    alt="ATATIVE"
-                    width={1200}
-                    height={213}
-                    priority
-                    className="hidden h-10 w-auto dark:block xl:h-12"
-                  />
-                </span>
+        {/* <Container> */}
+        <div className="flex h-16 items-center justify-between gap-4 md:h-20 lg:h-24">
+          {/* ---------------------------------------------------- */}
+          {/* Logo                                                  */}
+          {/* ---------------------------------------------------- */}
+          <AtativeHeaderLogo />
 
-                {/* Mobile / tablet lockup (below lg) */}
-                <span className="lg:hidden">
-                  <Image
-                    src={LOGO.mobileLight}
-                    alt="ATATIVE"
-                    width={800}
-                    height={142}
-                    priority
-                    className="block h-8 w-auto dark:hidden sm:h-9"
-                  />
-                  <Image
-                    src={LOGO.mobileDark}
-                    alt="ATATIVE"
-                    width={800}
-                    height={142}
-                    priority
-                    className="hidden h-8 w-auto dark:block sm:h-9"
-                  />
-                </span>
-              </Link>
-            </motion.div>
+          {/* ---------------------------------------------------- */}
+          {/* Actions                                               */}
+          {/* ---------------------------------------------------- */}
+          <motion.div
+            className="flex items-center gap-3"
+            variants={actionsContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {/* Social links — desktop only */}
+            <div className="hidden items-center gap-3 lg:flex">
+              {SOCIAL_LINKS.map((social) => (
+                <HeaderActionButton
+                  key={social.label}
+                  as="a"
+                  href={social.href}
+                  label={social.label}
+                  icon={social.icon}
+                />
+              ))}
+            </div>
 
-            {/* ---------------------------------------------------- */}
-            {/* Actions                                               */}
-            {/* ---------------------------------------------------- */}
-            <motion.div
-              className="flex items-center gap-3"
-              variants={actionsContainerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {/* Social links — desktop only */}
-              <div className="hidden items-center gap-3 lg:flex">
-                {SOCIAL_LINKS.map((social) => (
-                  <HeaderActionButton
-                    key={social.label}
-                    as="a"
-                    href={social.href}
-                    label={social.label}
-                    icon={social.icon}
-                  />
-                ))}
-              </div>
+            {/* Separator — between social icons and newsletter/menu group, desktop only */}
+            <ActionSeparator desktopOnly />
 
-              {/* Separator — between social icons and newsletter/menu group, desktop only */}
-              <ActionSeparator desktopOnly />
+            {/* Newsletter — always visible */}
+            <HeaderActionButton as="button" label="Newsletter" icon={Mail} />
 
-              {/* Newsletter — always visible */}
-              <HeaderActionButton as="button" label="Newsletter" icon={Mail} />
+            {/* Separator — between newsletter and menu, always visible */}
+            <ActionSeparator />
 
-              {/* Separator — between newsletter and menu, always visible */}
-              <ActionSeparator />
-
-              {/* Menu trigger — always visible. Drawer/sheet wiring is
+            {/* Menu trigger — always visible. Drawer/sheet wiring is
                   intentionally left out; hook onClick up when that
                   component exists. */}
-              <HeaderActionButton as="button" label="Open menu" icon={Menu} />
-            </motion.div>
-          </div>
-        </Container>
+            <HeaderActionButton as="button" label="Open menu" icon={Menu} />
+          </motion.div>
+        </div>
+        {/* </Container> */}
       </motion.div>
     </header>
   );
