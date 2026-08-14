@@ -1,15 +1,20 @@
+// src/components/(app)/(common)/navbars/top-navbar.tsx
+
 "use client";
 
-import { Show, SignInButton, UserButton } from "@clerk/nextjs";
+import { Show, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { motion, useReducedMotion, type Transition, type Variants } from "framer-motion";
-import { Mail, Menu } from "lucide-react";
+import { LayoutDashboard, Mail, Menu } from "lucide-react";
 import { useSyncExternalStore, type ComponentType } from "react";
 
+import type { CategoryListItem } from "@/app/actions/(category)/get-all-categories-action";
 import { cn } from "@/lib/utils";
 import AtativeHeaderLogo from "../logos/header-logo";
+import { ModeToggle } from "../theme/mode-toggle";
+import MobileMenu from "./_componenets/mobile-menu";
 
 /* ------------------------------------------------------------------ */
-/*  Brand accent — matches --primary (sage) from your theme            */
+/*  Brand accent                                                       */
 /* ------------------------------------------------------------------ */
 const ACCENT = "#829A88";
 
@@ -19,7 +24,7 @@ const ACCENT = "#829A88";
 const SECTIONS = ["Ideas", "Trends", "Reviews", "Guides", "Insights", "Culture", "Technology"];
 
 /* ------------------------------------------------------------------ */
-/*  Social brand icons                                                 */
+/*  Social icons                                                       */
 /* ------------------------------------------------------------------ */
 function InstagramIcon({ className }: { className?: string }) {
   return (
@@ -98,7 +103,7 @@ const SOCIAL_LINKS: SocialLink[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Framer Motion variants                                             */
+/*  Motion variants                                                    */
 /* ------------------------------------------------------------------ */
 const headerVariants: Variants = {
   hidden: { y: -20, opacity: 0 },
@@ -256,8 +261,7 @@ function HeaderActionButton(props: HeaderActionButtonProps) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Shared pill button styles (Subscribe + Sign in)                    */
-/*  Hover → primary in both light & dark mode                          */
+/*  Pill button styles                                                 */
 /* ------------------------------------------------------------------ */
 const pillButtonClass = cn(
   "inline-flex shrink-0 items-center justify-center gap-2 rounded-full",
@@ -269,7 +273,7 @@ const pillButtonClass = cn(
 );
 
 /* ------------------------------------------------------------------ */
-/*  Subscribe — hidden on small screens                                */
+/*  Subscribe                                                          */
 /* ------------------------------------------------------------------ */
 function SubscribeButton() {
   return (
@@ -287,13 +291,52 @@ function SubscribeButton() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Auth — Sign in + UserButton                                        */
+/*  Auth                                                               */
 /* ------------------------------------------------------------------ */
 function AuthActions() {
+  const { user } = useUser();
+
+  const isAdmin = (user?.publicMetadata as { role?: string } | undefined)?.role === "ADMIN";
+
+  const clerkAppearance = {
+    variables: {
+      colorPrimary: "hsl(var(--primary))",
+      colorBackground: "hsl(var(--background))",
+      colorInputBackground: "hsl(var(--background))",
+      colorInputText: "hsl(var(--foreground))",
+      colorText: "hsl(var(--foreground))",
+      colorTextSecondary: "hsl(var(--muted-foreground))",
+      colorDanger: "hsl(var(--destructive))",
+      borderRadius: "0.5rem",
+    },
+    elements: {
+      avatarBox: "h-9 w-9 ring-1 ring-border hover:ring-primary/40 transition-shadow duration-200",
+      userButtonPopoverCard: "bg-background text-foreground border border-border shadow-lg",
+      userButtonPopoverMain: "bg-background",
+      userButtonPopoverActionButton: "hover:bg-accent text-foreground",
+      userButtonPopoverActionButtonText: "text-foreground",
+      userButtonPopoverActionButtonIcon: "text-muted-foreground",
+      userButtonPopoverFooter: "hidden",
+      modalContent: "bg-background text-foreground",
+      card: "bg-background text-foreground border border-border shadow-xl",
+      headerTitle: "text-foreground",
+      headerSubtitle: "text-muted-foreground",
+      socialButtonsBlockButton:
+        "bg-background border border-border text-foreground hover:bg-accent",
+      socialButtonsBlockButtonText: "text-foreground",
+      formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90",
+      formFieldInput: "bg-background border border-input text-foreground focus:ring-ring",
+      formFieldLabel: "text-foreground",
+      footerActionLink: "text-primary hover:text-primary/80",
+      identityPreviewText: "text-foreground",
+      identityPreviewEditButton: "text-primary",
+    },
+  };
+
   return (
     <>
       <Show when="signed-out">
-        <SignInButton mode="modal">
+        <SignInButton mode="modal" appearance={clerkAppearance}>
           <motion.button
             type="button"
             variants={actionItemVariants}
@@ -308,19 +351,17 @@ function AuthActions() {
 
       <Show when="signed-in">
         <motion.div variants={actionItemVariants} className="flex items-center">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox:
-                  "h-9 w-9 ring-1 ring-border hover:ring-primary/40 transition-shadow duration-200",
-                userButtonPopoverCard:
-                  "shadow-lg border border-border bg-popover text-popover-foreground",
-                userButtonPopoverActionButton: "hover:bg-accent",
-                userButtonPopoverActionButtonText: "text-foreground",
-                userButtonPopoverFooter: "hidden",
-              },
-            }}
-          />
+          <UserButton appearance={clerkAppearance}>
+            {isAdmin && (
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  label="Dashboard"
+                  labelIcon={<LayoutDashboard className="h-4 w-4" />}
+                  href="/dashboard"
+                />
+              </UserButton.MenuItems>
+            )}
+          </UserButton>
         </motion.div>
       </Show>
     </>
@@ -328,7 +369,7 @@ function AuthActions() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Shared vertical separator                                          */
+/*  Separator                                                          */
 /* ------------------------------------------------------------------ */
 function ActionSeparator({ desktopOnly = false }: { desktopOnly?: boolean }) {
   return (
@@ -343,22 +384,26 @@ function ActionSeparator({ desktopOnly = false }: { desktopOnly?: boolean }) {
 /* ------------------------------------------------------------------ */
 /*  Site header                                                        */
 /* ------------------------------------------------------------------ */
-export default function SiteTopHeader() {
+type SiteTopHeaderProps = {
+  categories?: CategoryListItem[];
+};
+
+export default function SiteTopHeader({ categories = [] }: SiteTopHeaderProps) {
   return (
     <header className="relative z-40">
-      {/* Masthead strip — inverted so it always contrasts with the page */}
-      <div className="hidden h-9 items-center gap-6 bg-foreground px-4 text-background sm:flex sm:px-6 lg:px-8">
+      {/* Thin professional masthead */}
+      {/* <div className="hidden h-9 items-center gap-6 border-b border-border/40 bg-muted/30 px-4 text-muted-foreground backdrop-blur-sm sm:flex sm:px-6 lg:px-8">
         <MastheadDate />
         <SectionTicker />
         <a
           href="#subscribe"
-          className="shrink-0 text-[10.5px] font-medium uppercase tracking-[0.16em] opacity-90 underline-offset-4 transition-opacity hover:opacity-100 hover:underline"
+          className="shrink-0 text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
         >
           Subscribe
         </a>
-      </div>
+      </div> */}
 
-      {/* Primary header row */}
+      {/* Main header row */}
       <motion.div
         className="w-full border-b border-border/50 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
         variants={headerVariants}
@@ -366,19 +411,18 @@ export default function SiteTopHeader() {
         animate="visible"
       >
         <div className="flex h-16 items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6 md:h-[4.5rem] lg:h-20 lg:px-8">
-          {/* Logo */}
-          <div className="min-w-0 w-36 sm:w-48 md:w-52 lg:w-56">
+          {/* Logo – now larger and fluid */}
+          <div className="min-w-0 shrink-0">
             <AtativeHeaderLogo />
           </div>
 
-          {/* Actions */}
           <motion.div
-            className="flex shrink-0 items-center gap-1.5 sm:gap-2.5"
+            className="flex shrink-0 items-center gap-1 sm:gap-2"
             variants={actionsContainerVariants}
             initial="hidden"
             animate="visible"
           >
-            {/* Socials — large screens only */}
+            {/* Socials – large screens only */}
             <div className="hidden items-center gap-0.5 lg:flex">
               {SOCIAL_LINKS.map((social) => (
                 <HeaderActionButton
@@ -393,7 +437,7 @@ export default function SiteTopHeader() {
 
             <ActionSeparator desktopOnly />
 
-            {/* Subscribe — hidden on mobile */}
+            {/* Subscribe */}
             <SubscribeButton />
 
             <ActionSeparator />
@@ -403,8 +447,18 @@ export default function SiteTopHeader() {
 
             <ActionSeparator />
 
-            {/* Menu */}
-            <HeaderActionButton as="button" label="Open menu" icon={Menu} />
+            {/* Mode Toggle – visible on ALL devices */}
+            <motion.div variants={actionItemVariants} className="flex items-center">
+              <ModeToggle />
+            </motion.div>
+
+            <ActionSeparator />
+
+            {/* Mobile Menu */}
+            <MobileMenu
+              categories={categories}
+              trigger={<HeaderActionButton as="button" label="Open menu" icon={Menu} />}
+            />
           </motion.div>
         </div>
       </motion.div>

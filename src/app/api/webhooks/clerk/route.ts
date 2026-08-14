@@ -1,7 +1,8 @@
 // src/app/api/webhooks/clerk/route.ts
 
+import { ADMIN_EMAILS } from "@/lib/admin-emails";
 import prisma from "@/lib/prisam-client";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { WebhookEvent, clerkClient } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { Webhook } from "svix";
 
@@ -60,6 +61,11 @@ export async function POST(req: Request) {
           break;
         }
 
+        // Auto-promote to ADMIN if the email is in the allow-list
+        const role: "USER" | "ADMIN" = ADMIN_EMAILS.includes(email.toLowerCase())
+          ? "ADMIN"
+          : "USER";
+
         await prisma.user.upsert({
           where: { clerkId: data.id },
           update: {
@@ -75,11 +81,22 @@ export async function POST(req: Request) {
             lastName: data.last_name ?? null,
             email,
             imageUrl: data.image_url ?? null,
-            role: "USER",
+            role,
           },
         });
 
-        console.log("[Clerk Webhook] User created:", data.id);
+        // Mirror role into Clerk publicMetadata so middleware can read it
+        // straight from the session token, with no DB call needed.
+        try {
+          const client = await clerkClient();
+          await client.users.updateUserMetadata(data.id, {
+            publicMetadata: { role },
+          });
+        } catch (metaErr) {
+          console.error("[Clerk Webhook] Failed to sync metadata for", data.id, metaErr);
+        }
+
+        console.log("[Clerk Webhook] User created:", data.id, "role:", role);
         break;
       }
 

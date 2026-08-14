@@ -1,68 +1,48 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 type AtativeLogoProps = {
   className?: string;
-  color?: string;
   showWordmark?: boolean;
 };
 
-/* ------------------------------------------------------------------ */
-/*  ATATIVE mark — geometric "A" + wordmark, scales fluidly.           */
-/*                                                                      */
-/*  Motion is intentionally quiet: a single entrance stagger and one   */
-/*  slow breathing accent dot. The old rising-bubble trail was cut —   */
-/*  four looping particles fought for attention against the header's   */
-/*  new category ticker, and didn't mean anything for a publication    */
-/*  mark. One calm signal reads as considered; four reads as busy.     */
-/*  Respects prefers-reduced-motion (collapses to a static render).    */
-/* ------------------------------------------------------------------ */
-export function AtativeHeaderLogo({
-  className,
-  color = "#829A88",
-  showWordmark = true,
-}: AtativeLogoProps) {
+export function AtativeHeaderLogo({ className, showWordmark = true }: AtativeLogoProps) {
   const shouldReduceMotion = useReducedMotion();
 
   const containerVariants: Variants = {
     hidden: {},
     visible: {
       transition: {
-        staggerChildren: shouldReduceMotion ? 0 : 0.1,
-        delayChildren: 0.05,
+        staggerChildren: shouldReduceMotion ? 0 : 0.08,
+        delayChildren: 0.04,
       },
     },
   };
 
   const markVariants: Variants = {
-    hidden: { opacity: 0, scale: shouldReduceMotion ? 1 : 0.94 },
+    hidden: { opacity: 0, scale: shouldReduceMotion ? 1 : 0.92 },
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { duration: shouldReduceMotion ? 0 : 0.45, ease: "easeOut" },
+      transition: { duration: shouldReduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] },
     },
   };
 
   const wordmarkVariants: Variants = {
-    hidden: { opacity: 0, x: shouldReduceMotion ? 0 : -6 },
+    hidden: { opacity: 0, x: shouldReduceMotion ? 0 : -8 },
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: shouldReduceMotion ? 0 : 0.45, ease: "easeOut" },
+      transition: { duration: shouldReduceMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] },
     },
   };
 
   return (
     <motion.svg
-      viewBox={showWordmark ? "0 0 1200 213" : "0 0 100 213"}
-      className={className}
-      style={{
-        width: "100%",
-        height: "auto",
-        display: "block",
-        maxWidth: "100%",
-      }}
+      viewBox={showWordmark ? "0 0 680 140" : "0 0 110 140"}
+      className={cn("h-9 w-auto sm:h-10 md:h-11 lg:h-12", className)}
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="ATATIVE"
@@ -73,47 +53,65 @@ export function AtativeHeaderLogo({
     >
       <title>ATATIVE</title>
 
+      {/* Geometric Italic A */}
       <motion.g id="mark" variants={markVariants}>
+        {/* Main italic A shape */}
         <path
-          d="M50 66 L100 150 H78 L67 130 H33 L22 150 H0 L50 66 Z M50 96 L41 112 H59 L50 96 Z"
-          fill={color}
+          d="M62 16 
+             L118 122 
+             H94 
+             L82 94 
+             H38 
+             L26 122 
+             H2 
+             L62 16 
+             Z 
+             
+             M62 48 
+             L48 78 
+             H76 
+             L62 48 
+             Z"
+          fill="currentColor"
           fillRule="evenodd"
+          className="text-primary"
         />
 
-        {/* Single accent dot — a quiet, continuous "publishing" pulse. */}
+        {/* Soft accent pulse */}
         <motion.circle
-          cx={50}
-          cy={147}
-          r={6}
-          fill={color}
-          fillOpacity={0.4}
+          cx={62}
+          cy={118}
+          r={5.5}
+          className="fill-primary"
+          fillOpacity={0.35}
           animate={
             shouldReduceMotion
               ? undefined
               : {
-                  scale: [1, 1.2, 1],
-                  opacity: [0.4, 0.65, 0.4],
+                  scale: [1, 1.25, 1],
+                  opacity: [0.35, 0.6, 0.35],
                 }
           }
           transition={{
-            duration: 2.8,
+            duration: 3.2,
             repeat: shouldReduceMotion ? 0 : Infinity,
             ease: "easeInOut",
           }}
-          style={{ transformOrigin: "50px 147px" }}
+          style={{ transformOrigin: "62px 118px" }}
         />
       </motion.g>
 
+      {/* Wordmark */}
       {showWordmark && (
-        <motion.g id="wordmark" transform="translate(150, 0)" variants={wordmarkVariants}>
+        <motion.g id="wordmark" variants={wordmarkVariants}>
           <text
-            x="0"
-            y="140"
-            fontFamily="Georgia, 'Times New Roman', serif"
-            fontSize="92"
-            fontWeight="600"
-            letterSpacing="14"
-            fill={color}
+            x="148"
+            y="98"
+            fontFamily="var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif"
+            fontSize="72"
+            fontWeight="700"
+            letterSpacing="6"
+            className="fill-foreground"
           >
             ATATIVE
           </text>
