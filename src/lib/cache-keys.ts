@@ -7,5 +7,7 @@ export const CACHE_TAGS = {
   categories: "categories", // all categories list
   users: "users", // all users list,
   home: "home",
+  homeBlogs: "home:blogs",
+
   category: (slug: string) => `category:${slug}`,
 } as const;
