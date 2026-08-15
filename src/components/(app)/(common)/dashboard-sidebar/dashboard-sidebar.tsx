@@ -8,7 +8,6 @@ import {
   Newspaper,
   PanelLeftClose,
   PanelLeftOpen,
-  PenSquare,
   Tags,
   Users,
 } from "lucide-react";
@@ -30,7 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Category", href: "/dashboard/category", icon: Tags },
   { label: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { label: "Blogs", href: "/dashboard/blogs", icon: Newspaper },
-  { label: "Create Blog", href: "/dashboard/blogs/create", icon: PenSquare },
+  // { label: "Create Blog", href: "/dashboard/blogs/create", icon: PenSquare },
 ];
 
 const STORAGE_KEY = "dashboard-sidebar-collapsed";

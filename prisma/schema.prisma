@@ -101,6 +101,7 @@ model Blog {
   slug             String       @unique
   shortDescription String?      @db.Text
   content          Json
+  tableOfContents Json?
 
   type             BlogType     @default(ARTICLE)
   status           BlogStatus   @default(DRAFT)
