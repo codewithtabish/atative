@@ -8,7 +8,7 @@ interface BlogContentContainerProps extends React.HTMLAttributes<HTMLDivElement>
 export function BlogContentContainer({ children, className, ...props }: BlogContentContainerProps) {
   return (
     <div
-      className={cn("mx-auto w-full max-w-5xl", "min-w-0", "py-8 sm:py-10 lg:py-12 ", className)}
+      className={cn("mx-auto w-full max-w-4xl", "min-w-0", "py-8 sm:py-10 lg:py-12 ", className)}
       {...props}
     >
       {children}
