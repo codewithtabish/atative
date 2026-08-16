@@ -35,6 +35,7 @@ const CreateSingleBlogPage = () => {
 
       <div className="flex justify-center ">
         {/* <UploadImages /> */}
+
         <CreateBlogForm />
       </div>
     </div>
