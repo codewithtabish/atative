@@ -8,7 +8,7 @@ export const CACHE_TAGS = {
 
   // Home
   home: "home",
-  homeScreen: "home:screen", // ← for the entire Home page component
+  homeScreen: "home:screen",
 
   // Category pages
   category: (slug: string) => `category:${slug}`,
@@ -18,4 +18,7 @@ export const CACHE_TAGS = {
 
   // Comments
   comments: (blogId: string) => `comments:${blogId}`,
+
+  // Dashboard
+  dashboardBlogs: "dashboard:blogs",
 } as const;
