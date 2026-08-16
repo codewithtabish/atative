@@ -74,8 +74,8 @@
 }
 
 :root {
-  /* --background: oklch(0.9761 0.0041 91.4461); */
-  --background: oklch(0.968 0.01 90);
+  --background: oklch(0.9761 0.0041 91.4461);
+  /* --background: oklch(0.968 0.01 90); */
 
   --foreground: oklch(0.2417 0.0298 269.8827);
   --card: oklch(1 0 0);
@@ -147,10 +147,10 @@
 /* ------------------------------------------------------------------ */
 .dark {
   /* Page background — soft warm charcoal instead of pure black */
-  /* --background: oklch(0.195 0.008 95); */
+  --background: oklch(0.195 0.008 95);
 
   /* --background: oklch(0.17 0.01 285); */
-  --background: oklch(0.14 0.015 250);
+  /* --background: oklch(0.14 0.015 250); */
 
   /* Text — slightly warm off-white for easier reading */
   --foreground: oklch(0.945 0.005 95);

@@ -280,9 +280,7 @@ export default async function AtativeFooter() {
           {/* -------------------------------------------------------- */}
 
           <div className="max-w-[560px]">
-            <Link href="/" aria-label="ATATIVE home" className="inline-flex">
-              <AtativeHeaderLogo className="h-11 w-auto sm:h-12" />
-            </Link>
+            <AtativeHeaderLogo className="h-11 w-auto sm:h-12" />
 
             <p className="mt-7 max-w-[540px] text-[15px] leading-7 text-muted-foreground">
               ATATIVE is an independent editorial publication covering technology, AI, programming,

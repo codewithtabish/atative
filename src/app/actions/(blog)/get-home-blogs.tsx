@@ -16,7 +16,6 @@ export type HomeBlogListItem = {
   featured: boolean;
   publishedAt: Date | null;
   readingTime: number | null;
-  viewCount: number;
 
   author: {
     id: string;
@@ -80,7 +79,6 @@ async function getCachedHomeBlogs() {
       featured: true,
       publishedAt: true,
       readingTime: true,
-      viewCount: true,
 
       author: {
         select: {
