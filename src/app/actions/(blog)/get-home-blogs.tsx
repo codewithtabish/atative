@@ -51,7 +51,7 @@ async function getCachedHomeBlogs() {
   "use cache";
 
   cacheLife("max");
-  cacheTag(CACHE_TAGS.home, CACHE_TAGS.homeBlogs);
+  cacheTag(CACHE_TAGS.home);
 
   return prisma.blog.findMany({
     where: {

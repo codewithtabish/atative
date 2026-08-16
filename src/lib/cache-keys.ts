@@ -8,11 +8,13 @@ export const CACHE_TAGS = {
 
   // Home
   home: "home",
-  homeBlogs: "home:blogs",
 
   // Category pages
   category: (slug: string) => `category:${slug}`,
 
   // Individual blog
   blog: (slug: string) => `blog:${slug}`,
+
+  // Comments
+  comments: (blogId: string) => `comments:${blogId}`,
 } as const;

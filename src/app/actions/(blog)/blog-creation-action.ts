@@ -1,9 +1,10 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { OpenAI } from "openai";
 
+import { CACHE_TAGS } from "@/lib/cache-keys";
 import prisma from "@/lib/prisam-client";
 import { CreateBlogInput, CreateBlogResult } from "@/schemas/blog-schema";
 
@@ -224,7 +225,7 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
             ogImage: data.ogImage,
             twitterTitle: data.title,
             twitterDescription: seoData.twitterDescription,
-            twitterImage: data.ogImage, // same as OG
+            twitterImage: data.ogImage,
             schemaType: "Article",
           },
         },
@@ -232,13 +233,21 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
       include: { seo: true },
     });
 
-    // Revalidate
+    // ============================================================
+    // REVALIDATION
+    // ============================================================
     revalidatePath("/dashboard/blogs");
-    revalidatePath("/blogs");
+    // revalidatePath("/blogs");
     revalidatePath("/");
-    if (blog.featured) {
-      // await revalidateFeaturedBlogCache();
-    }
+
+    // Always revalidate the home cache so the new blog appears on homepage
+    revalidateTag(CACHE_TAGS.home, "max");
+
+    // Also revalidate the single blog page cache
+    // revalidateTag(CACHE_TAGS.blog(blog.slug));
+
+    // If the blog belongs to a category, you can also revalidate that later
+    // revalidateTag(CACHE_TAGS.category(categorySlug));
 
     return {
       success: true,

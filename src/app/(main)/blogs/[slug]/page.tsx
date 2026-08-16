@@ -1,10 +1,13 @@
+import { BlogCommentsSkeleton } from "@/app/actions/(blog)/blog-comments-skeleton";
 import { getBlogBySlugAction } from "@/app/actions/(blog)/get-blog-by-slug-action";
 import { BlogContentContainer } from "@/components/(app)/(common)/layout/blog-content-container";
 import { BlogPreviewer } from "@/components/(app)/(dashbaord)/blog/blog-previewr";
+import { BlogComments } from "@/components/(app)/(pages)/blog/blog-comment";
 import BlogHeader from "@/components/(app)/(pages)/blog/single-blog-header";
 import TheDaily from "@/components/(app)/(pages)/homepage/the-daily";
 import { TableOfContentsItem } from "@/schemas/blog-schema";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 type PageProps = {
   params: Promise<{
@@ -47,6 +50,9 @@ export default async function SingleBlogPage({ params }: PageProps) {
           }
         />
         <hr />
+        <Suspense fallback={<BlogCommentsSkeleton />}>
+          <BlogComments blogId={blog.id} blogSlug={blog.slug} />
+        </Suspense>
         <TheDaily />
       </BlogContentContainer>
 
