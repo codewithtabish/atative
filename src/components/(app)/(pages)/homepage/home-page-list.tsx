@@ -1,4 +1,6 @@
 import { getHomeBlogsAction, HomeBlogListItem } from "@/app/actions/(blog)/get-home-blogs";
+import { CACHE_TAGS } from "@/lib/cache-keys";
+import { cacheLife, cacheTag } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import TheDaily from "./the-daily";
@@ -116,10 +118,15 @@ function CategoryArticle({ blog, large = false }: { blog: HomeBlogListItem; larg
 }
 
 // ─────────────────────────────────────────────
-// Main Component
+// Main Component (with cache)
 // ─────────────────────────────────────────────
 
 export default async function HomeBlog() {
+  "use cache";
+
+  cacheLife("max");
+  cacheTag(CACHE_TAGS.homeScreen);
+
   const result = await getHomeBlogsAction();
 
   if (!result.success) {
@@ -134,7 +141,6 @@ export default async function HomeBlog() {
 
   const hero = blogs[0] ?? null;
   const secondary = blogs[1] ?? null;
-
   const latestItems = blogs.slice(0, 3);
 
   return (
@@ -142,7 +148,6 @@ export default async function HomeBlog() {
       {/* ════════════════════════════════════════
           TOP STORIES
       ════════════════════════════════════════ */}
-
       <section className="pb-16 pt-10">
         <div className="mb-8 flex items-end justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -152,7 +157,6 @@ export default async function HomeBlog() {
 
         <div className="grid gap-8 lg:grid-cols-12">
           {/* HERO */}
-
           <div className="lg:col-span-8">
             {hero ? (
               <Link
@@ -169,8 +173,7 @@ export default async function HomeBlog() {
                     className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     sizes="(max-width: 1024px) 100vw, 66vw"
                   />
-
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 md:p-10">
@@ -198,11 +201,8 @@ export default async function HomeBlog() {
 
                   <div className="mt-5 flex items-center gap-3 text-sm text-zinc-300">
                     <span className="font-medium text-white">{authorName(hero.author)}</span>
-
                     <span>·</span>
-
                     <span>{readingTimeLabel(hero.readingTime)}</span>
-
                     {hero.publishedAt && (
                       <>
                         <span>·</span>
@@ -213,14 +213,13 @@ export default async function HomeBlog() {
                 </div>
               </Link>
             ) : (
-              <div className="flex aspect-[16/10] items-center justify-center rounded-3xl border border-dashed border-border">
+              <div className="flex aspect-16/10 items-center justify-center rounded-3xl border border-dashed border-border">
                 <p className="text-muted-foreground">No featured story yet</p>
               </div>
             )}
           </div>
 
           {/* LATEST SIDEBAR */}
-
           <div className="lg:col-span-4">
             <div className="sticky top-8 space-y-6">
               <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -244,7 +243,6 @@ export default async function HomeBlog() {
                       <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
                         {blog.category.name}
                       </span>
-
                       <h4 className="mt-0.5 line-clamp-2 text-sm font-semibold leading-snug transition-colors group-hover:text-primary">
                         {blog.title}
                       </h4>
@@ -264,16 +262,13 @@ export default async function HomeBlog() {
       {/* ════════════════════════════════════════
           TRENDING NOW
       ════════════════════════════════════════ */}
-
       <section className="border-y border-border py-14">
         <div>
           <div className="mb-8 flex items-center gap-3">
             <span className="text-xl">✦</span>
-
             <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
               Trending Now
             </h2>
-
             <span className="text-xl">✦</span>
           </div>
 
@@ -283,9 +278,7 @@ export default async function HomeBlog() {
             ))}
 
             {blogs.length < 4 &&
-              Array.from({
-                length: 4 - blogs.length,
-              }).map((_, i) => (
+              Array.from({ length: 4 - blogs.length }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
                   className="flex aspect-[3/4] items-center justify-center rounded-2xl border border-dashed border-border"
@@ -300,13 +293,11 @@ export default async function HomeBlog() {
       {/* ════════════════════════════════════════
           EXPLORE + EDITOR'S PICK
       ════════════════════════════════════════ */}
-
       <section className="py-16">
         <div className="mb-10 text-center">
           <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
             ✦ Explore Atative ✦
           </h2>
-
           <p className="mt-3 text-lg text-muted-foreground">Discover ideas worth your attention.</p>
 
           <div className="mt-6 flex flex-wrap justify-center gap-3">
@@ -322,11 +313,9 @@ export default async function HomeBlog() {
           </div>
         </div>
 
-        {/* Editor's Pick */}
-
         {secondary && (
           <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-border shadow-sm">
-            <div className="relative aspect-[21/9]">
+            <div className="relative aspect-21/9">
               <Image
                 src={secondary.bannerImage}
                 alt={secondary.bannerImageAlt || secondary.title}
@@ -334,14 +323,11 @@ export default async function HomeBlog() {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 768px"
               />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-
+              <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
                 <span className="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
                   Editor&apos;s Pick
                 </span>
-
                 <h3 className="text-xl font-bold text-white sm:text-2xl">{secondary.title}</h3>
               </div>
             </div>
@@ -352,7 +338,6 @@ export default async function HomeBlog() {
       {/* ════════════════════════════════════════
           FROM THE CATEGORIES
       ════════════════════════════════════════ */}
-
       {blogs.length > 0 && (
         <section className="border-t border-border py-16">
           <h2 className="mb-10 text-center text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
@@ -360,23 +345,17 @@ export default async function HomeBlog() {
           </h2>
 
           <div className="grid gap-12 lg:grid-cols-2">
-            {/* Left column */}
-
             <div>
               <h3 className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {hero?.category.name || "Featured"}
               </h3>
-
               {hero && <CategoryArticle blog={hero} large />}
             </div>
-
-            {/* Right column */}
 
             <div>
               <h3 className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 {secondary?.category.name || "More"}
               </h3>
-
               {secondary && <CategoryArticle blog={secondary} large />}
             </div>
           </div>
@@ -386,17 +365,14 @@ export default async function HomeBlog() {
       {/* ════════════════════════════════════════
           THE DAILY
       ════════════════════════════════════════ */}
-
       <section className="border-t border-border py-20">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
             The Daily
           </h2>
-
           <p className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
             A little smarter, every day.
           </p>
-
           <p className="mt-3 text-muted-foreground">
             Get the best ideas, guides & stories from ATATIVE.
           </p>
@@ -408,7 +384,6 @@ export default async function HomeBlog() {
               className="w-full rounded-full border border-border bg-background px-5 py-3 text-sm outline-none ring-ring focus:ring-2 sm:max-w-xs"
               required
             />
-
             <button
               type="submit"
               className="rounded-full bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
@@ -424,7 +399,6 @@ export default async function HomeBlog() {
       {/* ════════════════════════════════════════
           MOST READ
       ════════════════════════════════════════ */}
-
       <section className="border-t border-border py-16">
         <div className="mx-auto max-w-3xl">
           <h2 className="mb-8 text-center text-sm font-semibold uppercase tracking-[0.25em] text-muted-foreground">
@@ -438,12 +412,10 @@ export default async function HomeBlog() {
                   <span className="mt-0.5 text-2xl font-bold tabular-nums text-muted-foreground/40 transition-colors group-hover:text-primary">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-
                   <div>
                     <h3 className="text-base font-semibold leading-snug transition-colors group-hover:text-primary">
                       {blog.title}
                     </h3>
-
                     <p className="mt-1 text-sm text-muted-foreground">
                       {authorName(blog.author)} · {readingTimeLabel(blog.readingTime)}
                     </p>
@@ -462,10 +434,8 @@ export default async function HomeBlog() {
       {/* ════════════════════════════════════════
           FOOTER STRIP
       ════════════════════════════════════════ */}
-
       <footer className="border-t border-border py-10 text-center">
         <p className="text-sm font-semibold tracking-tight">ATATIVE</p>
-
         <p className="mt-1 text-xs text-muted-foreground">Ideas · Guides · Trends · Insights</p>
       </footer>
     </div>

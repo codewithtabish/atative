@@ -242,6 +242,7 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
 
     // Always revalidate the home cache so the new blog appears on homepage
     revalidateTag(CACHE_TAGS.home, "max");
+    revalidateTag(CACHE_TAGS.homeScreen, "max");
 
     // Also revalidate the single blog page cache
     // revalidateTag(CACHE_TAGS.blog(blog.slug));

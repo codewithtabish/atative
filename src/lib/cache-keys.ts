@@ -8,6 +8,7 @@ export const CACHE_TAGS = {
 
   // Home
   home: "home",
+  homeScreen: "home:screen", // ← for the entire Home page component
 
   // Category pages
   category: (slug: string) => `category:${slug}`,
