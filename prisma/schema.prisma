@@ -13,22 +13,22 @@ datasource db {
 // ============================================================
 
 model User {
-  id          String   @id @default(cuid())
-  clerkId     String   @unique
+  id          String    @id @default(cuid())
+  clerkId     String    @unique
 
-  email       String   @unique
+  email       String    @unique
   firstName   String?
   lastName    String?
   imageUrl    String?
 
-  bio         String?  @db.Text
+  bio         String?   @db.Text
   location    String?
   website     String?
 
-  role        UserRole @default(USER)
+  role        UserRole  @default(USER)
 
-  isActive    Boolean  @default(true)
-  isVerified  Boolean  @default(false)
+  isActive    Boolean   @default(true)
+  isVerified  Boolean   @default(false)
 
   lastLoginAt DateTime?
   lastSeenAt  DateTime?
@@ -36,8 +36,8 @@ model User {
   blogs       Blog[]
   comments    Comment[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 enum UserRole {
@@ -47,22 +47,66 @@ enum UserRole {
 
 
 // ============================================================
+// EDITOR
+// ============================================================
+
+model Editor {
+  id          String   @id @default(cuid())
+
+  name        String
+  email       String   @unique
+
+  imageUrl    String?
+  bio         String?  @db.Text
+  experience  String?  @db.Text
+  location    String?
+  website     String?
+
+  twitter     String?
+  linkedin    String?
+  facebook    String?
+  instagram   String?
+  github      String?
+
+  isActive    Boolean  @default(true)
+
+  categories  Category[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([name])
+}
+
+
+// ============================================================
 // CATEGORY
 // ============================================================
 
 model Category {
   id            String        @id @default(cuid())
+
   name          String
   slug          String        @unique
   description   String?       @db.Text
+
   isActive      Boolean       @default(true)
   sortOrder     Int           @default(0)
+
+  // Assigned editor
+  editorId      String?
+  editor        Editor?       @relation(fields: [editorId], references: [id], onDelete: SetNull)
 
   subcategories Subcategory[]
   blogs         Blog[]
 
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+
+  @@index([editorId])
+  @@index([isActive])
+  @@index([sortOrder])
 }
 
 
@@ -72,9 +116,11 @@ model Category {
 
 model Subcategory {
   id          String   @id @default(cuid())
+
   name        String
   slug        String   @unique
   description String?  @db.Text
+
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
 
@@ -87,6 +133,8 @@ model Subcategory {
   updatedAt   DateTime @updatedAt
 
   @@index([categoryId])
+  @@index([isActive])
+  @@index([sortOrder])
 }
 
 
@@ -100,8 +148,9 @@ model Blog {
   title            String
   slug             String       @unique
   shortDescription String?      @db.Text
+
   content          Json
-  tableOfContents Json?
+  tableOfContents  Json?
 
   type             BlogType     @default(ARTICLE)
   status           BlogStatus   @default(DRAFT)
@@ -174,30 +223,30 @@ enum BlogStatus {
 // ============================================================
 
 model BlogSEO {
-  id                 String   @id @default(cuid())
+  id                String   @id @default(cuid())
 
-  blogId             String   @unique
-  blog               Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
+  blogId            String   @unique
+  blog              Blog     @relation(fields: [blogId], references: [id], onDelete: Cascade)
 
-  metaTitle          String
-  metaDescription    String   @db.Text
-  canonicalUrl       String?
+  metaTitle         String
+  metaDescription   String   @db.Text
+  canonicalUrl      String?
 
-  noIndex            Boolean  @default(false)
-  noFollow           Boolean  @default(false)
+  noIndex           Boolean  @default(false)
+  noFollow          Boolean  @default(false)
 
-  ogTitle            String?
-  ogDescription      String?  @db.Text
-  ogImage            String?
+  ogTitle           String?
+  ogDescription     String?  @db.Text
+  ogImage           String?
 
-  twitterTitle       String?
-  twitterDescription String?  @db.Text
-  twitterImage       String?
+  twitterTitle      String?
+  twitterDescription String? @db.Text
+  twitterImage      String?
 
-  schemaType         String   @default("Article")
+  schemaType        String   @default("Article")
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 
@@ -207,6 +256,7 @@ model BlogSEO {
 
 model Tag {
   id        String    @id @default(cuid())
+
   name      String
   slug      String    @unique
 
@@ -239,6 +289,7 @@ model BlogTag {
 
 model Comment {
   id        String        @id @default(cuid())
+
   content   String        @db.Text
 
   blogId    String
@@ -281,6 +332,7 @@ enum CommentStatus {
 
 model NewsletterSubscriber {
   id             String           @id @default(cuid())
+
   email          String           @unique
 
   status         NewsletterStatus @default(PENDING)

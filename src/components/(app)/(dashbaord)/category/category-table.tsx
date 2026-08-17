@@ -1,7 +1,7 @@
 // src/app/(pages)/dashboard/category/_components/category-table.tsx
 "use client";
 
-import { ChevronDown, ChevronRight, Loader2, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Loader2, Trash2, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -115,6 +116,7 @@ export function CategoryTable({ categories }: CategoryTableProps) {
               <TableHead className="w-[36px]" />
               <TableHead>Name</TableHead>
               <TableHead>Slug</TableHead>
+              <TableHead>Editor</TableHead>
               <TableHead className="text-center">Subcategories</TableHead>
               <TableHead className="text-center">Sort order</TableHead>
               <TableHead className="text-center">Status</TableHead>
@@ -146,16 +148,51 @@ export function CategoryTable({ categories }: CategoryTableProps) {
                         <span className="sr-only">Toggle subcategories</span>
                       </Button>
                     </TableCell>
+
                     <TableCell className="font-medium">{category.name}</TableCell>
+
                     <TableCell className="font-mono text-xs text-muted-foreground">
                       {category.slug}
                     </TableCell>
+
+                    {/* Editor column */}
+                    <TableCell>
+                      {category.editor ? (
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Avatar className="h-6 w-6 shrink-0">
+                            <AvatarImage
+                              src={category.editor.imageUrl ?? undefined}
+                              alt={category.editor.name}
+                            />
+                            <AvatarFallback className="text-[10px]">
+                              {category.editor.name.slice(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium leading-none">
+                              {category.editor.name}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground mt-0.5">
+                              {category.editor.email}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <UserRound className="h-3.5 w-3.5" />
+                          <span className="text-sm">Unassigned</span>
+                        </div>
+                      )}
+                    </TableCell>
+
                     <TableCell className="text-center text-sm text-muted-foreground">
                       {category.subcategories.length}
                     </TableCell>
+
                     <TableCell className="text-center text-sm text-muted-foreground">
                       {category.sortOrder}
                     </TableCell>
+
                     <TableCell className="text-center">
                       <Badge
                         variant={category.isActive ? "default" : "secondary"}
@@ -168,6 +205,7 @@ export function CategoryTable({ categories }: CategoryTableProps) {
                         {category.isActive ? "Active" : "Inactive"}
                       </Badge>
                     </TableCell>
+
                     <TableCell className="text-right">
                       <Button
                         type="button"
@@ -196,7 +234,7 @@ export function CategoryTable({ categories }: CategoryTableProps) {
                   {isExpanded && hasSubcategories && (
                     <TableRow className="hover:bg-transparent">
                       <TableCell />
-                      <TableCell colSpan={6} className="bg-muted/20 py-3">
+                      <TableCell colSpan={7} className="bg-muted/20 py-3">
                         <ul className="flex flex-col divide-y divide-border/70 pl-1">
                           {category.subcategories.map((subcategory: SubcategoryListItem) => (
                             <li

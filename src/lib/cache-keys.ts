@@ -6,6 +6,10 @@ export const CACHE_TAGS = {
   categories: "categories",
   users: "users",
 
+  // Editors
+  editors: "editors",
+  // editor: (id: string) => `editor:${id}`,
+
   // Home
   home: "home",
   homeScreen: "home:screen",

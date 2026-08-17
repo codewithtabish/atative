@@ -1,4 +1,5 @@
 // src/app/actions/(category)/delete-category-action.ts
+
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
@@ -7,48 +8,141 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/cache-keys";
 import prisma from "@/lib/prisam-client";
 
-type DeleteCategoryResult = { success: true } | { success: false; error: string };
+type DeleteCategoryResult =
+  | {
+      success: true;
+    }
+  | {
+      success: false;
+      error: string;
+    };
 
 export async function deleteCategoryAction(categoryId: string): Promise<DeleteCategoryResult> {
-  // ── Auth guard (defense-in-depth alongside middleware) ──
+  // ============================================================
+  // 1. AUTHENTICATION
+  // ============================================================
+
   const { userId } = await auth();
+
   if (!userId) {
-    return { success: false, error: "You must be signed in." };
+    return {
+      success: false,
+      error: "You must be signed in.",
+    };
   }
 
-  const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+  // ============================================================
+  // 2. ADMIN AUTHORIZATION
+  // ============================================================
+
+  const dbUser = await prisma.user.findUnique({
+    where: {
+      clerkId: userId,
+    },
+    select: {
+      id: true,
+      role: true,
+    },
+  });
+
   if (!dbUser || dbUser.role !== "ADMIN") {
-    return { success: false, error: "You are not authorized to do this." };
+    return {
+      success: false,
+      error: "You are not authorized to do this.",
+    };
   }
 
-  if (!categoryId) {
-    return { success: false, error: "Missing category id." };
+  // ============================================================
+  // 3. VALIDATE CATEGORY ID
+  // ============================================================
+
+  if (!categoryId?.trim()) {
+    return {
+      success: false,
+      error: "Missing category id.",
+    };
   }
 
   try {
+    // ============================================================
+    // 4. CHECK CATEGORY EXISTS
+    // ============================================================
+
     const category = await prisma.category.findUnique({
-      where: { id: categoryId },
-      select: { id: true },
+      where: {
+        id: categoryId,
+      },
+      select: {
+        id: true,
+        editorId: true,
+      },
     });
 
     if (!category) {
-      return { success: false, error: "Category not found." };
+      return {
+        success: false,
+        error: "Category not found.",
+      };
     }
 
-    // Cascade delete: subcategories first, then the category itself.
-    // Wrapped in a transaction so it's all-or-nothing — if either
-    // delete fails, nothing gets removed.
+    // ============================================================
+    // 5. DELETE CATEGORY
+    //
+    // Deletes:
+    // - Category
+    // - Its subcategories
+    //
+    // Does NOT delete:
+    // - Editor
+    //
+    // Because Category.editorId belongs to the Category row,
+    // deleting the Category automatically removes that
+    // category-editor association.
+    // ============================================================
+
     await prisma.$transaction([
-      prisma.subcategory.deleteMany({ where: { categoryId } }),
-      prisma.category.delete({ where: { id: categoryId } }),
+      prisma.subcategory.deleteMany({
+        where: {
+          categoryId,
+        },
+      }),
+
+      prisma.category.delete({
+        where: {
+          id: categoryId,
+        },
+      }),
     ]);
 
+    // ============================================================
+    // 6. REVALIDATE CACHE
+    // ============================================================
+
+    // Category list changed.
     revalidateTag(CACHE_TAGS.categories, "max");
+
+    // Editor/category assignment data may have changed.
+    revalidateTag(CACHE_TAGS.editors, "max");
+
+    // Dashboard category page.
     revalidatePath("/dashboard/category");
 
-    return { success: true };
+    // Editor management page/list.
+    revalidatePath("/dashboard/editors");
+
+    // ============================================================
+    // 7. SUCCESS
+    // ============================================================
+
+    return {
+      success: true,
+    };
   } catch (err) {
-    console.error("[deleteCategory] Error:", err);
-    return { success: false, error: "Something went wrong. Try again." };
+    console.error("[deleteCategoryAction] Error:", err);
+
+    return {
+      success: false,
+      error: "Something went wrong. Try again.",
+    };
   }
 }

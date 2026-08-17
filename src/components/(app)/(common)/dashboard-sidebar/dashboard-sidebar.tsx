@@ -1,4 +1,5 @@
 // src/components/dashboard/sidebar.tsx
+
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Tags,
+  UserRoundPen,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -41,6 +43,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Users",
     href: "/dashboard/users",
     icon: Users,
+  },
+  {
+    label: "Editors",
+    href: "/dashboard/editors",
+    icon: UserRoundPen,
   },
   {
     label: "Category",
@@ -98,7 +105,7 @@ function setCollapsedStore(next: boolean) {
    SIDEBAR
    ========================================================= */
 
-export function DasshboardSidebar() {
+export function DashboardSidebar() {
   return (
     <Suspense fallback={<DashboardSidebarSkeleton />}>
       <DashboardSidebarContent />
@@ -191,11 +198,13 @@ function DashboardSidebarContent() {
           aria-label="ATATIVE Dashboard"
         >
           {/* Brand mark */}
+
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-sidebar-primary/40 font-serif text-base font-semibold text-sidebar-primary">
             A
           </span>
 
           {/* Wordmark */}
+
           <span
             className={cn(
               "flex min-w-0 flex-col overflow-hidden transition-all duration-300",
@@ -313,6 +322,7 @@ function DashboardSidebarContent() {
                   )}
                 >
                   {/* Icon */}
+
                   <Icon
                     className={cn(
                       "h-[18px] w-[18px] shrink-0",
@@ -323,6 +333,7 @@ function DashboardSidebarContent() {
                   />
 
                   {/* Label */}
+
                   <span
                     className={cn(
                       "overflow-hidden whitespace-nowrap",
@@ -396,23 +407,27 @@ function DashboardSidebarSkeleton() {
   return (
     <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground">
       {/* Header */}
+
       <div className="flex h-20 shrink-0 items-center border-b border-sidebar-border px-5">
         <div className="flex items-center gap-2.5">
           <div className="h-8 w-8 shrink-0 animate-pulse rounded-sm bg-sidebar-accent" />
 
           <div className="space-y-1.5">
             <div className="h-4 w-20 animate-pulse rounded bg-sidebar-accent" />
+
             <div className="h-2.5 w-24 animate-pulse rounded bg-sidebar-accent" />
           </div>
         </div>
       </div>
 
       {/* Section label */}
+
       <div className="px-5 pt-5 pb-2">
         <div className="h-2.5 w-16 animate-pulse rounded bg-sidebar-accent" />
       </div>
 
       {/* Navigation */}
+
       <nav className="flex-1 px-3">
         <ul className="space-y-1">
           {NAV_ITEMS.map((item) => (
@@ -428,6 +443,7 @@ function DashboardSidebarSkeleton() {
       </nav>
 
       {/* Footer */}
+
       <div className="flex items-center justify-between border-t border-sidebar-border p-4">
         <div className="h-2.5 w-28 animate-pulse rounded bg-sidebar-accent" />
 
@@ -437,4 +453,4 @@ function DashboardSidebarSkeleton() {
   );
 }
 
-export default DasshboardSidebar;
+export default DashboardSidebar;

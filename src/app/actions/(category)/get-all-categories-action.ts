@@ -14,6 +14,13 @@ export type SubcategoryListItem = {
   sortOrder: number;
 };
 
+export type CategoryEditorItem = {
+  id: string;
+  name: string;
+  email: string;
+  imageUrl: string | null;
+};
+
 export type CategoryListItem = {
   id: string;
   name: string;
@@ -21,10 +28,13 @@ export type CategoryListItem = {
   isActive: boolean;
   sortOrder: number;
   subcategories: SubcategoryListItem[];
+  /** The editor currently assigned to this category (null if unassigned) */
+  editor: CategoryEditorItem | null;
 };
 
 type GetAllCategoriesResult =
   { success: true; categories: CategoryListItem[] } | { success: false; error: string };
+
 async function getCachedCategories() {
   "use cache";
   cacheLife("max");
@@ -46,6 +56,14 @@ async function getCachedCategories() {
           sortOrder: true,
         },
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      },
+      editor: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          imageUrl: true,
+        },
       },
     },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
