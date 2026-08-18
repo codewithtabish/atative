@@ -1,8 +1,10 @@
 // src/app/api/webhooks/clerk/route.ts
 
 import { ADMIN_EMAILS } from "@/lib/admin-emails";
+import { CACHE_TAGS } from "@/lib/cache-keys";
 import prisma from "@/lib/prisam-client";
 import { WebhookEvent, clerkClient } from "@clerk/nextjs/server";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { headers } from "next/headers";
 import { Webhook } from "svix";
 
@@ -85,6 +87,8 @@ export async function POST(req: Request) {
           },
         });
 
+        revalidateTag(CACHE_TAGS.users, "max");
+
         // Mirror role into Clerk publicMetadata so middleware can read it
         // straight from the session token, with no DB call needed.
         try {
@@ -122,6 +126,8 @@ export async function POST(req: Request) {
             imageUrl: data.image_url ?? null,
           },
         });
+        revalidateTag(CACHE_TAGS.users, "max");
+        revalidatePath("/dashboard/users");
 
         console.log("[Clerk Webhook] User updated:", data.id);
         break;
@@ -141,6 +147,9 @@ export async function POST(req: Request) {
               lastSeenAt: new Date(),
             },
           });
+          revalidateTag(CACHE_TAGS.users, "max");
+          revalidatePath("/dashboard/users");
+
           console.log("[Clerk Webhook] Login tracked:", data.user_id);
         }
         break;
@@ -157,6 +166,8 @@ export async function POST(req: Request) {
             where: { clerkId: data.id },
           });
           console.log("[Clerk Webhook] User deleted:", data.id);
+          revalidateTag(CACHE_TAGS.users, "max");
+          revalidatePath("/dashboard/users");
         }
         break;
       }
