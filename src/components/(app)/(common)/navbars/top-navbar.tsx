@@ -1,15 +1,15 @@
 // src/components/(app)/(common)/navbars/top-navbar.tsx
-
 "use client";
 
 import { Show, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { motion, useReducedMotion, type Transition, type Variants } from "framer-motion";
 import { LayoutDashboard, Mail, Menu } from "lucide-react";
+import Link from "next/link";
 import { useSyncExternalStore, type ComponentType } from "react";
 
 import type { CategoryListItem } from "@/app/actions/(category)/get-all-categories-action";
 import { cn } from "@/lib/utils";
-import AtativeHeaderLogo from "../logos/header-logo";
+import { ThemeLogo } from "../logos/theme-logo";
 import { ModeToggle } from "../theme/mode-toggle";
 import MobileMenu from "./_componenets/mobile-menu";
 
@@ -390,19 +390,7 @@ type SiteTopHeaderProps = {
 
 export default function SiteTopHeader({ categories = [] }: SiteTopHeaderProps) {
   return (
-    <header className="relative z-40">
-      {/* Thin professional masthead */}
-      {/* <div className="hidden h-9 items-center gap-6 border-b border-border/40 bg-muted/30 px-4 text-muted-foreground backdrop-blur-sm sm:flex sm:px-6 lg:px-8">
-        <MastheadDate />
-        <SectionTicker />
-        <a
-          href="#subscribe"
-          className="shrink-0 text-[10.5px] font-medium uppercase tracking-[0.16em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-        >
-          Subscribe
-        </a>
-      </div> */}
-
+    <header className="relative z-40 md:py-3">
       {/* Main header row */}
       <motion.div
         className="w-full border-b border-border/50 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70"
@@ -410,11 +398,21 @@ export default function SiteTopHeader({ categories = [] }: SiteTopHeaderProps) {
         initial="hidden"
         animate="visible"
       >
-        <div className="flex h-16 items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6 md:h-[4.5rem] lg:h-20 lg:px-8">
-          {/* Logo – now larger and fluid */}
-          <div className="min-w-0 shrink-0">
-            <AtativeHeaderLogo />
-          </div>
+        <div className="flex h-28 items-center justify-between gap-3 px-4 sm:gap-4 sm:px-6 md:h-[4.5rem] lg:h-20 lg:px-8">
+          {/* Logo – fixed height container so it never collapses */}
+          {/* Logo – larger and clearer */}
+          <Link
+            href="/"
+            className="flex h-14 shrink-0 items-center sm:h-16 lg:h-18"
+            aria-label="Alentah Technology – Home"
+          >
+            <ThemeLogo
+              width={400}
+              height={100}
+              priority
+              className="h-full w-auto max-w-[220px] sm:max-w-[220px] md:max-w-[260px] lg:max-w-[300px]"
+            />
+          </Link>
 
           <motion.div
             className="flex shrink-0 items-center gap-1 sm:gap-2"
@@ -447,7 +445,7 @@ export default function SiteTopHeader({ categories = [] }: SiteTopHeaderProps) {
 
             <ActionSeparator />
 
-            {/* Mode Toggle – visible on ALL devices */}
+            {/* Mode Toggle */}
             <motion.div variants={actionItemVariants} className="flex items-center">
               <ModeToggle />
             </motion.div>

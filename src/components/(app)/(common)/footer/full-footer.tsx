@@ -5,8 +5,8 @@ import Link from "next/link";
 import type { ComponentType, ReactNode } from "react";
 
 import { getAllCategoriesAction } from "@/app/actions/(category)/get-all-categories-action";
-import AtativeHeaderLogo from "@/components/(app)/(common)/logos/header-logo";
 import { cn } from "@/lib/utils";
+import { ThemeLogo } from "../logos/theme-logo";
 
 /* ------------------------------------------------------------------ */
 /*  Copyright                                                         */
@@ -280,7 +280,19 @@ export default async function AtativeFooter() {
           {/* -------------------------------------------------------- */}
 
           <div className="max-w-[560px]">
-            <AtativeHeaderLogo className="h-11 w-auto sm:h-12" />
+            <Link
+              href="/"
+              className="flex h-28 shrink-0 items-center "
+              aria-label="Alentah Technology – Home"
+            >
+              <ThemeLogo
+                width={400}
+                height={220}
+                priority
+                className="h-full w-auto max-w-[220px] sm:max-w-[220px] md:max-w-[260px] lg:max-w-[300px]"
+              />
+            </Link>
+            {/* <AtativeHeaderLogo className="h-11 w-auto sm:h-12" /> */}
 
             <p className="mt-7 max-w-[540px] text-[15px] leading-7 text-muted-foreground">
               ATATIVE is an independent editorial publication covering technology, AI, programming,

@@ -32,7 +32,7 @@ export default async function CategoryNavBar() {
           {categories.map((category) => (
             <Link
               key={category.id}
-              href={`/category/${category.slug}`}
+              href={`/${category.slug}`}
               className={cn(
                 "shrink-0 whitespace-nowrap  font-bold px-4 py-3.5",
                 "text-[14px] font-medium uppercase tracking-[0.1em]",

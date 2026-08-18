@@ -1,5 +1,3 @@
-// src/lib/cache-keys.ts
-
 // Central place for cache tags used with `use cache` + `revalidateTag`.
 
 export const CACHE_TAGS = {
@@ -16,6 +14,7 @@ export const CACHE_TAGS = {
 
   // Category pages
   category: (slug: string) => `category:${slug}`,
+  categoryBlogs: (slug: string) => `category:blogs:${slug}`,
 
   // Individual blog
   blog: (slug: string) => `blog:${slug}`,
