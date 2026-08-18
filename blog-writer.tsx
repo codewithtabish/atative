@@ -1143,3 +1143,54 @@
 // 29. When I say "table section", use a polished responsive editorial table.
 
 // 30. The final result should feel like a world-class editorial publication, not a simple blog editor.
+
+// section
+
+// <section class="my-12 space-y-6 sm:my-16">
+//   <p class="text-sm font-semibold uppercase tracking-[0.18em] text-primary">
+//     AI &amp; Robotics
+//   </p>
+
+//   <h2
+//     id="what-is-ai-robotics"
+//     class="scroll-mt-24 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-[2.7rem]"
+//   >
+//     What Is AI Robotics?
+//   </h2>
+
+//   <p class="text-lg leading-8 text-muted-foreground">
+//     AI robotics is the combination of artificial intelligence and robotics to
+//     create machines that can perceive their surroundings, learn from data, make
+//     decisions, and perform tasks with increasing levels of autonomy. Unlike
+//     traditional robots that typically follow a fixed set of instructions,
+//     AI-powered robots can use technologies such as machine learning, computer
+//     vision, natural language processing, and sensor data to adapt to changing
+//     environments.
+//   </p>
+
+//   <p class="text-lg leading-8 text-muted-foreground">
+//     This shift is transforming robots from programmable machines into
+//     increasingly intelligent systems. A modern robot can recognize objects,
+//     understand its environment, plan movements, respond to unexpected
+//     situations, and improve its performance over time. These capabilities are
+//     opening new possibilities across manufacturing, healthcare, logistics,
+//     agriculture, transportation, and everyday consumer applications.
+//   </p>
+
+//   <p class="text-lg leading-8 text-muted-foreground">
+//     At its core, AI gives robots the ability to interpret information and make
+//     decisions, while robotics gives that intelligence a physical form. Together,
+//     they are creating a new generation of intelligent machines that can interact
+//     with the real world in ways that were previously difficult or impossible to
+//     achieve.
+//   </p>
+
+//   <div class="mt-8 border-l-2 border-primary/40 pl-5">
+//     <p class="text-base leading-7 text-muted-foreground">
+//       <strong class="font-semibold text-foreground">In simple terms:</strong>
+//       traditional robots follow instructions, while AI-powered robots can
+//       interpret information, make decisions, and adapt their behavior based on
+//       what they encounter.
+//     </p>
+//   </div>
+// </section>

@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import CreateBlogForm from "@/components/(app)/(dashbaord)/blog/blog-create-form";
+import ScrollToTopBottom from "@/components/(app)/(dashbaord)/blog/floating-button";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import Link from "next/link";
 
 const CreateSingleBlogPage = () => {
   return (
@@ -33,11 +33,12 @@ const CreateSingleBlogPage = () => {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex justify-center ">
-        {/* <UploadImages /> */}
-
+      <div className="flex justify-center">
         <CreateBlogForm />
       </div>
+
+      {/* Floating scroll button - only on this page */}
+      <ScrollToTopBottom />
     </div>
   );
 };
