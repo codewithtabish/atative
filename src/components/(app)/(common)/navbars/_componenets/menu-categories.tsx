@@ -20,7 +20,7 @@ export default async function MenuCategories() {
           return (
             <Link
               key={category.id}
-              href={`/category/${category.slug}`}
+              href={`/${category.slug}`}
               className="border-b border-border/60 py-4 text-[15px] font-semibold uppercase tracking-[0.08em] text-foreground transition-colors hover:text-primary"
             >
               {category.name}
@@ -32,7 +32,7 @@ export default async function MenuCategories() {
           <details key={category.id} className="group border-b border-border/60">
             <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-[15px] font-semibold uppercase tracking-[0.08em] text-foreground [&::-webkit-details-marker]:hidden">
               <Link
-                href={`/category/${category.slug}`}
+                href={`/${category.slug}`}
                 onClick={(e) => e.stopPropagation()}
                 className="transition-colors hover:text-primary"
               >
@@ -45,7 +45,7 @@ export default async function MenuCategories() {
               {activeSubs.map((sub) => (
                 <li key={sub.id}>
                   <Link
-                    href={`/category/${category.slug}/${sub.slug}`}
+                    href={`/${category.slug}/${sub.slug}`}
                     className="text-sm font-medium uppercase tracking-[0.04em] text-muted-foreground transition-colors hover:text-foreground"
                   >
                     {sub.name}

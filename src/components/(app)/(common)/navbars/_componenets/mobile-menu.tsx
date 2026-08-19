@@ -170,7 +170,7 @@ export default function MobileMenu({ categories, trigger }: MobileMenuProps) {
                   <div key={category.id}>
                     <div className="flex items-center justify-between">
                       <Link
-                        href={`/category/${category.slug}`}
+                        href={`/${category.slug}`}
                         onClick={() => setOpen(false)}
                         className="flex-1 py-3 text-[13px] font-medium uppercase tracking-[0.08em] text-foreground transition-colors hover:text-primary"
                       >
@@ -193,7 +193,7 @@ export default function MobileMenu({ categories, trigger }: MobileMenuProps) {
                         {activeSubs.map((sub) => (
                           <Link
                             key={sub.id}
-                            href={`/category/${category.slug}/${sub.slug}`}
+                            href={`/${category.slug}/${sub.slug}`}
                             onClick={() => setOpen(false)}
                             className="block py-2 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
                           >

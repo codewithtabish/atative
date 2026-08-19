@@ -347,7 +347,7 @@ export default async function AtativeFooter() {
                   {column.map((category) => (
                     <div key={category.id}>
                       <Link
-                        href={`/category/${category.slug}`}
+                        href={`/${category.slug}`}
                         className="group inline-flex items-center gap-1 text-sm font-medium text-foreground transition-colors hover:text-primary"
                       >
                         {category.name}
@@ -363,7 +363,7 @@ export default async function AtativeFooter() {
                           {category.subcategories.slice(0, 4).map((subcategory) => (
                             <Link
                               key={subcategory.id}
-                              href={`/category/${category.slug}/${subcategory.slug}`}
+                              href={`/${category.slug}/${subcategory.slug}`}
                               className="block text-xs leading-5 text-muted-foreground transition-colors hover:text-foreground"
                             >
                               {subcategory.name}
