@@ -1,6 +1,5 @@
 import { getHomeBlogsAction, HomeBlogListItem } from "@/app/actions/(blog)/get-home-blogs";
-import { CACHE_TAGS } from "@/lib/cache-keys";
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheLife } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import TheDaily from "./the-daily";
@@ -133,7 +132,7 @@ export default async function HomeBlog() {
   "use cache";
 
   cacheLife("max");
-  cacheTag(CACHE_TAGS.homeScreen);
+  // cacheTag(CACHE_TAGS.homeScreen);
 
   const result = await getHomeBlogsAction();
 
