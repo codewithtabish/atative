@@ -104,7 +104,7 @@ function EditorRow({ editor }: { editor: EditorListItem }) {
           </Avatar>
           <div className="min-w-0">
             <p className="truncate text-sm font-medium">{editor.name}</p>
-            <p className="truncate text-xs text-muted-foreground">{editor.email}</p>
+            {/* <p className="truncate text-xs text-muted-foreground">{editor.email}</p> */}
           </div>
         </div>
       </TableCell>
