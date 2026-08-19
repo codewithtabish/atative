@@ -1,14 +1,15 @@
-const AboutPage = () => {
-  return (
-    <div>
-      Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus saepe architecto id
-      dolorum. Asperiores, animi. Error itaque iusto saepe autem rerum repellat, corporis quam.
-      Consequuntur velit dolorem veniam quidem! Laudantium? Lorem ipsum dolor sit amet consectetur
-      adipisicing elit. Voluptatibus saepe architecto id dolorum. Asperiores, animi. Error itaque
-      iusto saepe autem rerum repellat, corporis quam. Consequuntur velit dolorem veniam quidem!
-      Laudantium?
-    </div>
-  );
+import { AboutPage } from "@/components/(app)/(pages)/about/about-page-comp";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Alentah",
+  description:
+    "Learn about Alentah, a modern technology publication covering artificial intelligence, robotics, software, AI tools, productivity, creativity, and emerging technologies.",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
-export default AboutPage;
+export default function AboutRoute() {
+  return <AboutPage />;
+}

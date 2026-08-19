@@ -60,12 +60,6 @@ async function getCachedHomeBlogs() {
         not: null,
         lte: new Date(),
       },
-      category: {
-        isActive: true,
-      },
-      subcategory: {
-        isActive: true,
-      },
     },
 
     select: {
@@ -106,16 +100,11 @@ async function getCachedHomeBlogs() {
       },
     },
 
-    orderBy: [
-      {
-        featured: "desc",
-      },
-      {
-        publishedAt: "desc",
-      },
-    ],
+    orderBy: {
+      publishedAt: "desc",
+    },
 
-    take: 20,
+    take: 25,
   });
 }
 

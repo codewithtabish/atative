@@ -124,24 +124,17 @@ const COMPANY_LINKS = [
     label: "About ATATIVE",
     href: "/about",
   },
-  {
-    label: "Our Mission",
-    href: "/about/mission",
-  },
-  {
-    label: "Our Team",
-    href: "/about/team",
-  },
-  {
-    label: "Newsletter",
-    href: "/newsletter",
-  },
+
+  // {
+  // label: "Newsletter",
+  // href: "/newsletter",
+  // },
 ];
 
 const LEGAL_LINKS = [
   {
     label: "Privacy Policy",
-    href: "/privacy",
+    href: "/privacy-policy",
   },
   {
     label: "Terms of Use",
@@ -150,10 +143,6 @@ const LEGAL_LINKS = [
   {
     label: "Advertise",
     href: "/advertise",
-  },
-  {
-    label: "Accessibility",
-    href: "/accessibility",
   },
 ];
 

@@ -1,4 +1,4 @@
-import { getHomeBlogsAction, HomeBlogListItem } from "@/app/actions/(blog)/get-home-blogs";
+import { getHomeBlogsAction, HomeBlogListItem } from "@/app/actions/(blog)/get-home-blogs-action";
 import { cacheLife } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
