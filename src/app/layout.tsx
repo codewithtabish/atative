@@ -2,6 +2,7 @@ import { ThemeProvider } from "@/components/(app)/(common)/theme/theme-provider"
 import type { Metadata } from "next";
 import "./globals.css";
 
+import ExitIntentPopup from "@/components/(app)/(pages)/newsletter/exit-intent-popup";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import { Toaster } from "sonner";
@@ -169,8 +170,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             enableSystem
             disableTransitionOnChange
           >
+            <ExitIntentPopup />
             {children}
             <Toaster />
+            {/* ✅ Add Exit Intent Popup here */}
           </ThemeProvider>
         </ClerkProvider>
       </body>
