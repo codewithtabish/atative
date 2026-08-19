@@ -14,7 +14,8 @@ export const CACHE_TAGS = {
 
   // Category pages
   category: (slug: string) => `category:${slug}`,
-  categoryBlogs: (slug: string) => `category:blogs:${slug}`,
+  categoryPageBlogs: (slug: string) => `category:blogs:${slug}`,
+  subcategoryPageBlogs: (slug: string) => `subcategory:blogs:${slug}`,
 
   // Individual blog
   blog: (slug: string) => `blog:${slug}`,

@@ -1,4 +1,5 @@
 // src/app/actions/(blog)/update-blog-action.ts
+
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
@@ -17,10 +18,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 // ============================================================
 // INPUT / OUTPUT TYPES
-// If you already have UpdateBlogInput / UpdateBlogResult in
-// @/schemas/blog-schema, delete these locals and import from there
-// instead — kept local here since that file wasn't shared.
 // ============================================================
+
 export interface UpdateBlogInput {
   id: string;
   title: string;
@@ -54,13 +53,15 @@ export type UpdateBlogResult =
         };
       };
     }
-  | { success: false; error: string };
+  | {
+      success: false;
+      error: string;
+    };
 
 // ============================================================
 // HELPERS
-// Duplicated from blog-creation-action.ts. If you need these in a
-// third place, move them to a shared src/lib/blog-content.ts.
 // ============================================================
+
 function extractTextFromContent(content: any): string {
   if (!content?.blocks) return "";
 
@@ -70,20 +71,25 @@ function extractTextFromContent(content: any): string {
         case "paragraph":
         case "aitext":
           return block.data?.text || "";
+
         case "header":
           return `${"#".repeat(block.data?.level || 2)} ${block.data?.text || ""}`;
+
         case "list":
         case "checklist":
           return (block.data?.items || [])
             .map((item: any) => (typeof item === "string" ? item : item.content || item.text || ""))
             .join("\n");
+
         case "quote":
           return `> ${block.data?.text || ""}`;
+
         case "raw":
           return (block.data?.html || "")
             .replace(/<[^>]+>/g, " ")
             .replace(/\s+/g, " ")
             .trim();
+
         default:
           return "";
       }
@@ -94,17 +100,25 @@ function extractTextFromContent(content: any): string {
 
 function estimateReadingTime(content: any): number {
   const text = extractTextFromContent(content);
+
   const words = text.trim().split(/\s+/).filter(Boolean).length;
+
   return Math.max(1, Math.ceil(words / 200));
 }
+
+// ============================================================
+// AI SEO GENERATION
+// ============================================================
 
 async function generateSEOWithAI(title: string, contentText: string) {
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
+
       messages: [
         {
           role: "system",
+
           content: `You are an expert SEO specialist. Generate professional SEO metadata and a short description.
 
 STRICT RULES:
@@ -124,32 +138,46 @@ STRICT RULES:
   "summary": "2-3 sentence summary"
 }`,
         },
+
         {
           role: "user",
-          content: `Blog Title: ${title}\n\nBlog Content:\n${contentText.slice(0, 3500)}`,
+
+          content: `Blog Title: ${title}
+
+Blog Content:
+${contentText.slice(0, 3500)}`,
         },
       ],
+
       temperature: 0.7,
       max_tokens: 1200,
     });
 
     const aiResponse = response.choices[0]?.message?.content || "";
+
     const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
 
     if (jsonMatch) {
       const parsed = JSON.parse(jsonMatch[0]);
+
       return {
         shortDescription:
           parsed.shortDescription ||
           `Learn about ${title} — a comprehensive guide with expert insights.`,
+
         metaTitle: parsed.metaTitle || title.slice(0, 60),
+
         metaDescription:
           parsed.metaDescription ||
           `Read about ${title}. Discover detailed insights and information.`,
+
         ogDescription: parsed.ogDescription || `Learn more about ${title}`,
+
         twitterDescription:
           parsed.twitterDescription || parsed.ogDescription || `Learn about ${title}`,
+
         keywords: Array.isArray(parsed.keywords) ? parsed.keywords.slice(0, 10) : [],
+
         summary: parsed.summary || "",
       };
     }
@@ -157,13 +185,20 @@ STRICT RULES:
     throw new Error("Invalid AI response format");
   } catch (error) {
     console.error("OpenAI generation error:", error);
+
     return {
       shortDescription: `Learn about ${title} — a comprehensive guide with expert insights and practical tips.`,
+
       metaTitle: title.slice(0, 60),
+
       metaDescription: `Read about ${title}. Discover detailed insights, tips, and comprehensive information.`,
+
       ogDescription: `Explore ${title} - a comprehensive guide with expert insights.`,
+
       twitterDescription: `Learn about ${title} - expert insights and comprehensive guide.`,
+
       keywords: [title.toLowerCase().replace(/\s+/g, "-")],
+
       summary: `A comprehensive guide about ${title}.`,
     };
   }
@@ -172,162 +207,464 @@ STRICT RULES:
 // ============================================================
 // UPDATE BLOG ACTION
 // ============================================================
+
 export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlogResult> {
   try {
+    // ========================================================
+    // AUTHENTICATION
+    // ========================================================
+
     const { userId: clerkId } = await auth();
+
     if (!clerkId) {
-      return { success: false, error: "Unauthorized. Please sign in." };
+      return {
+        success: false,
+        error: "Unauthorized. Please sign in.",
+      };
     }
 
+    // ========================================================
+    // FIND USER
+    // ========================================================
+
     const user = await prisma.user.findUnique({
-      where: { clerkId },
-      select: { id: true },
+      where: {
+        clerkId,
+      },
+
+      select: {
+        id: true,
+      },
     });
 
     if (!user) {
-      return { success: false, error: "User not found in database." };
+      return {
+        success: false,
+        error: "User not found in database.",
+      };
     }
 
-    // Validation
-    if (!data.id?.trim()) return { success: false, error: "Blog id is required." };
-    if (!data.title?.trim()) return { success: false, error: "Title is required." };
-    if (!data.slug?.trim()) return { success: false, error: "Slug is required." };
-    if (!data.bannerImage) return { success: false, error: "Banner image is required." };
-    if (!data.ogImage) return { success: false, error: "OG image is required." };
+    // ========================================================
+    // VALIDATION
+    // ========================================================
+
+    if (!data.id?.trim()) {
+      return {
+        success: false,
+        error: "Blog id is required.",
+      };
+    }
+
+    if (!data.title?.trim()) {
+      return {
+        success: false,
+        error: "Title is required.",
+      };
+    }
+
+    if (!data.slug?.trim()) {
+      return {
+        success: false,
+        error: "Slug is required.",
+      };
+    }
+
+    if (!data.bannerImage) {
+      return {
+        success: false,
+        error: "Banner image is required.",
+      };
+    }
+
+    if (!data.ogImage) {
+      return {
+        success: false,
+        error: "OG image is required.",
+      };
+    }
+
     if (!data.categoryId || !data.subcategoryId) {
-      return { success: false, error: "Category and subcategory are required." };
+      return {
+        success: false,
+        error: "Category and subcategory are required.",
+      };
     }
+
     if (!data.content?.blocks?.length) {
-      return { success: false, error: "Blog content cannot be empty." };
+      return {
+        success: false,
+        error: "Blog content cannot be empty.",
+      };
     }
+
+    // ========================================================
+    // FIND EXISTING BLOG
+    // ========================================================
 
     const existingBlog = await prisma.blog.findUnique({
-      where: { id: data.id },
-      select: { id: true, slug: true },
+      where: {
+        id: data.id,
+      },
+
+      select: {
+        id: true,
+        slug: true,
+        categoryId: true,
+        subcategoryId: true,
+      },
     });
+
     if (!existingBlog) {
-      return { success: false, error: "Blog not found." };
+      return {
+        success: false,
+        error: "Blog not found.",
+      };
     }
 
-    // Duplicate slug check — only against OTHER blogs, since keeping the
-    // same slug on save must not trip over itself.
-    if (data.slug !== existingBlog.slug) {
+    // ========================================================
+    // DUPLICATE SLUG CHECK
+    // ========================================================
+
+    const newSlug = data.slug.trim();
+
+    if (newSlug !== existingBlog.slug) {
       const slugTaken = await prisma.blog.findFirst({
-        where: { slug: data.slug, NOT: { id: data.id } },
-        select: { id: true },
+        where: {
+          slug: newSlug,
+
+          NOT: {
+            id: data.id,
+          },
+        },
+
+        select: {
+          id: true,
+        },
       });
+
       if (slugTaken) {
-        return { success: false, error: "A blog with this slug already exists." };
+        return {
+          success: false,
+          error: "A blog with this slug already exists.",
+        };
       }
     }
 
-    // Validate category + subcategory
+    // ========================================================
+    // VALIDATE CATEGORY + SUBCATEGORY
+    //
+    // We need both slugs because the public URL is:
+    //
+    // /category/subcategory/blog-slug
+    // ========================================================
+
     const subcategory = await prisma.subcategory.findFirst({
       where: {
         id: data.subcategoryId,
         categoryId: data.categoryId,
         isActive: true,
       },
-      select: { id: true },
+
+      select: {
+        id: true,
+        slug: true,
+
+        category: {
+          select: {
+            id: true,
+            slug: true,
+            isActive: true,
+          },
+        },
+      },
     });
-    if (!subcategory) {
-      return { success: false, error: "Invalid category / subcategory combination." };
+
+    if (!subcategory || !subcategory.category || !subcategory.category.isActive) {
+      return {
+        success: false,
+        error: "Invalid category / subcategory combination.",
+      };
     }
 
+    // ========================================================
+    // CATEGORY + SUBCATEGORY SLUGS
+    // ========================================================
+
+    const categorySlug = subcategory.category.slug;
+
+    const subcategorySlug = subcategory.slug;
+
+    // ========================================================
+    // CANONICAL URL
+    //
+    // Final public URL:
+    //
+    // https://www.alentah.com/ai/generative-ai/blog-slug
+    // ========================================================
+
+    const canonicalUrl = `${BASE_URL}/${categorySlug}/${subcategorySlug}/${newSlug}`;
+
+    // ========================================================
+    // CONTENT + SEO
+    // ========================================================
+
     const contentText = extractTextFromContent(data.content);
-    const seoData = await generateSEOWithAI(data.title, contentText);
+
+    const seoData = await generateSEOWithAI(data.title.trim(), contentText);
+
     const readingTime = estimateReadingTime(data.content);
-    const canonicalUrl = `${BASE_URL}/blogs/${data.slug}`;
+
+    // ========================================================
+    // STATUS
+    // ========================================================
 
     const status = data.status || "DRAFT";
+
     const isPublished = status === "PUBLISHED";
 
+    // ========================================================
+    // UPDATE BLOG
+    // ========================================================
+
     const blog = await prisma.blog.update({
-      where: { id: data.id },
+      where: {
+        id: data.id,
+      },
+
       data: {
         title: data.title.trim(),
-        slug: data.slug.trim(),
+
+        slug: newSlug,
+
         shortDescription: seoData.shortDescription,
+
         content: data.content,
+
         tableOfContents: data.tableOfContents ?? [],
+
         type: data.type as any,
+
         status: status as any,
+
         bannerImage: data.bannerImage,
-        bannerImageAlt: data.bannerImageAlt || data.title,
+
+        bannerImageAlt: data.bannerImageAlt || data.title.trim(),
+
         featured: data.featured ?? false,
-        publishedAt: isPublished ? new Date() : null,
+
+        publishedAt: isPublished
+          ? existingBlog.categoryId !== data.categoryId ||
+            existingBlog.subcategoryId !== data.subcategoryId ||
+            existingBlog.slug !== newSlug
+            ? new Date()
+            : undefined
+          : null,
+
         scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : null,
+
         categoryId: data.categoryId,
+
         subcategoryId: data.subcategoryId,
+
         readingTime,
+
+        // ====================================================
+        // SEO
+        // ====================================================
+
         seo: {
           upsert: {
             create: {
               metaTitle: seoData.metaTitle,
+
               metaDescription: seoData.metaDescription,
+
               canonicalUrl,
+
               noIndex: false,
+
               noFollow: false,
-              ogTitle: data.title,
+
+              ogTitle: data.title.trim(),
+
               ogDescription: seoData.ogDescription,
+
               ogImage: data.ogImage,
-              twitterTitle: data.title,
+
+              twitterTitle: data.title.trim(),
+
               twitterDescription: seoData.twitterDescription,
+
               twitterImage: data.ogImage,
+
               schemaType: "Article",
             },
+
             update: {
               metaTitle: seoData.metaTitle,
+
               metaDescription: seoData.metaDescription,
+
               canonicalUrl,
-              ogTitle: data.title,
+
+              noIndex: false,
+
+              noFollow: false,
+
+              ogTitle: data.title.trim(),
+
               ogDescription: seoData.ogDescription,
+
               ogImage: data.ogImage,
-              twitterTitle: data.title,
+
+              twitterTitle: data.title.trim(),
+
               twitterDescription: seoData.twitterDescription,
+
               twitterImage: data.ogImage,
             },
           },
         },
       },
-      include: { seo: true },
+
+      include: {
+        seo: true,
+      },
     });
 
-    // ============================================================
-    // REVALIDATION
-    // ============================================================
-    revalidatePath("/");
+    // ========================================================
+    // CACHE REVALIDATION
+    // ========================================================
+
+    // --------------------------------------------------------
+    // Dashboard
+    // --------------------------------------------------------
+
     revalidatePath("/dashboard/blogs");
 
-    revalidateTag(CACHE_TAGS.home, "max");
-    revalidateTag(CACHE_TAGS.homeScreen, "max");
     revalidateTag(CACHE_TAGS.dashboardBlogs, "max");
+
+    // --------------------------------------------------------
+    // Homepage
+    // --------------------------------------------------------
+
+    revalidatePath("/");
+
+    revalidateTag(CACHE_TAGS.home, "max");
+
+    revalidateTag(CACHE_TAGS.homeScreen, "max");
+
+    // --------------------------------------------------------
+    // CURRENT CATEGORY PAGE
+    // --------------------------------------------------------
+
+    revalidateTag(CACHE_TAGS.categoryPageBlogs(categorySlug), "max");
+
+    // --------------------------------------------------------
+    // CURRENT SUBCATEGORY PAGE
+    // --------------------------------------------------------
+
+    revalidateTag(CACHE_TAGS.subcategoryPageBlogs(subcategorySlug), "max");
+
+    // --------------------------------------------------------
+    // CURRENT BLOG
+    // --------------------------------------------------------
+
     revalidateTag(CACHE_TAGS.blog(blog.slug), "max");
-    // If the slug changed, the OLD cached single-blog page is now stale too.
+
+    // --------------------------------------------------------
+    // OLD BLOG URL
+    //
+    // Important if slug changed.
+    // --------------------------------------------------------
+
     if (existingBlog.slug !== blog.slug) {
       revalidateTag(CACHE_TAGS.blog(existingBlog.slug), "max");
     }
+
+    // --------------------------------------------------------
+    // OLD CATEGORY CACHE
+    //
+    // Important if category was changed.
+    // --------------------------------------------------------
+
+    if (existingBlog.categoryId !== data.categoryId) {
+      const oldCategory = await prisma.category.findUnique({
+        where: {
+          id: existingBlog.categoryId,
+        },
+
+        select: {
+          slug: true,
+        },
+      });
+
+      if (oldCategory) {
+        revalidateTag(CACHE_TAGS.categoryPageBlogs(oldCategory.slug), "max");
+      }
+    }
+
+    // --------------------------------------------------------
+    // OLD SUBCATEGORY CACHE
+    //
+    // Important if subcategory was changed.
+    // --------------------------------------------------------
+
+    if (existingBlog.subcategoryId !== data.subcategoryId) {
+      const oldSubcategory = await prisma.subcategory.findUnique({
+        where: {
+          id: existingBlog.subcategoryId,
+        },
+
+        select: {
+          slug: true,
+        },
+      });
+
+      if (oldSubcategory) {
+        revalidateTag(CACHE_TAGS.subcategoryPageBlogs(oldSubcategory.slug), "max");
+      }
+    }
+
+    // --------------------------------------------------------
+    // COMMENTS
+    // --------------------------------------------------------
+
     revalidateTag(CACHE_TAGS.comments(blog.id), "max");
+
+    // ========================================================
+    // RESPONSE
+    // ========================================================
 
     return {
       success: true,
+
       data: {
         blog: {
           id: blog.id,
+
           title: blog.title,
+
           slug: blog.slug,
+
           shortDescription: blog.shortDescription,
+
           featured: blog.featured,
+
           status: blog.status,
+
           publishedAt: blog.publishedAt,
+
           updatedAt: blog.updatedAt,
         },
       },
     };
   } catch (error) {
     console.error("❌ Update blog error:", error);
+
     return {
       success: false,
+
       error: error instanceof Error ? error.message : "Failed to update blog",
     };
   }

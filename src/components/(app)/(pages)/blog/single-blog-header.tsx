@@ -1,7 +1,6 @@
 import { BlogType } from "@/generated/prisma/enums";
-import { CalendarDays, ChevronRight, Clock3, Share2, UserRound } from "lucide-react";
+import { CalendarDays, Clock3, UserRound } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 
 export type BlogHeaderProps = {
   title: string;
@@ -70,7 +69,7 @@ export default function BlogHeader({
       {/* =====================================================
           BREADCRUMB
       ====================================================== */}
-      <div className="mb-8 flex items-center justify-between gap-4">
+      {/* <div className="mb-8 flex items-center justify-between gap-4">
         <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-sm">
           <Link
             href="/"
@@ -108,7 +107,7 @@ export default function BlogHeader({
         >
           <Share2 className="size-4" />
         </button>
-      </div>
+      </div> */}
 
       {/* =====================================================
           ARTICLE TYPE

@@ -20,7 +20,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { createBlogAction } from "@/app/actions/(blog)/blog-creation-action";
+import { createBlogAction } from "@/app/actions/(blog)/(dashboard)/blog-creation-action";
 import { getAllCategoriesAction } from "@/app/actions/(category)/get-all-categories-action";
 import { uploadBannerAction } from "@/app/actions/(images)/upload-banner-action";
 import { uploadOgAction } from "@/app/actions/(images)/upload-og-action";

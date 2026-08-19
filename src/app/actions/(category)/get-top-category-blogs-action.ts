@@ -51,6 +51,14 @@ export type CategoryPageEditor = {
   email: string;
   imageUrl: string | null;
   bio: string | null;
+  experience: string | null;
+  location: string | null;
+  website: string | null;
+  twitter: string | null;
+  linkedin: string | null;
+  facebook: string | null;
+  instagram: string | null;
+  github: string | null;
   /** true when no real editor is assigned and this is a placeholder */
   isFake: boolean;
 };
@@ -77,6 +85,14 @@ const FAKE_EDITOR: Omit<CategoryPageEditor, "isFake"> = {
   email: "editorial@example.com",
   imageUrl: null,
   bio: "Curated and reviewed by our editorial team.",
+  experience: null,
+  location: null,
+  website: null,
+  twitter: null,
+  linkedin: null,
+  facebook: null,
+  instagram: null,
+  github: null,
 };
 
 // ============================================================
@@ -86,7 +102,7 @@ const FAKE_EDITOR: Omit<CategoryPageEditor, "isFake"> = {
 async function getCachedCategoryPageBlogs(slug: string) {
   "use cache";
   cacheLife("max");
-  cacheTag(CACHE_TAGS.category(slug), CACHE_TAGS.categoryBlogs(slug));
+  cacheTag(CACHE_TAGS.categoryPageBlogs(slug));
 
   return prisma.category.findUnique({
     where: { slug, isActive: true },
@@ -113,6 +129,14 @@ async function getCachedCategoryPageBlogs(slug: string) {
           email: true,
           imageUrl: true,
           bio: true,
+          experience: true,
+          location: true,
+          website: true,
+          twitter: true,
+          linkedin: true,
+          facebook: true,
+          instagram: true,
+          github: true,
         },
       },
       blogs: {
