@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://www.alentah.com";
+const SITE_URL = "https://www.alentah.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,14 +8,22 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/dashboard/", "/admin/", "/api/"],
+        disallow: ["/dashboard/", "/admin/", "/auth/", "/api/"],
       },
       {
         userAgent: "facebookexternalhit",
         allow: "/",
       },
+      {
+        userAgent: "Twitterbot",
+        allow: "/",
+      },
+      {
+        userAgent: "LinkedInBot",
+        allow: "/",
+      },
     ],
-    sitemap: `${siteUrl}/sitemap.xml`,
-    host: siteUrl,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }
