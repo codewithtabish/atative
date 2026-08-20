@@ -1,5 +1,3 @@
-import { Container } from "../../(common)/layout/container";
-
 interface SectionMeta {
   id: string;
   number: string;
@@ -86,7 +84,7 @@ function SummaryCard({ title, children }: { title: string; children: React.React
 
 export function PrivacyPolicy() {
   return (
-    <Container>
+    <main>
       <main className="pb-20 pt-16 md:pb-28 md:pt-24">
         <article className="mx-auto max-w-4xl">
           {/* Hero */}
@@ -664,6 +662,6 @@ export function PrivacyPolicy() {
           </div>
         </article>
       </main>
-    </Container>
+    </main>
   );
 }

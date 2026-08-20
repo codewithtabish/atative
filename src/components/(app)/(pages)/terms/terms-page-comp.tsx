@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Container } from "../../(common)/layout/container";
 
 /**
  * Terms of Use — Alentah
@@ -95,7 +94,7 @@ function ExternalTermLink({ href, children }: { href: string; children: ReactNod
 
 export function TermsPageComp() {
   return (
-    <Container>
+    <main>
       {/* Hero */}
       <header className="border-b border-border/60 pb-10 pt-4 sm:pb-14 sm:pt-8">
         <div className="mx-auto max-w-3xl">
@@ -148,7 +147,7 @@ export function TermsPageComp() {
         <aside className="hidden lg:block">
           <nav
             aria-label="Table of contents"
-            className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-2 [-ms-overflow-style:none] scrollbar-none [&::-webkit-scrollbar]:hidden"
           >
             <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground">
               On this page
@@ -644,7 +643,7 @@ export function TermsPageComp() {
           </nav>
         </main>
       </div>
-    </Container>
+    </main>
   );
 }
 

@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 
 import { getAllEditorsAction } from "@/app/actions/(editor)/get-all-editors";
-import { Container } from "@/components/(app)/(common)/layout/container";
 import {
   EditorCategories,
   EditorImage,
@@ -210,7 +209,7 @@ export async function AboutPage() {
   const activeEditors = result.success ? result.editors.filter((e) => e.isActive) : [];
 
   return (
-    <Container>
+    <main>
       <div className="pb-24 pt-16 md:pb-32 md:pt-24">
         {/* ========================================================= */}
         Hero
@@ -468,6 +467,6 @@ export async function AboutPage() {
           </div>
         </section>
       </div>
-    </Container>
+    </main>
   );
 }

@@ -695,9 +695,7 @@ export function HomePageComp() {
       <Suspense fallback={<HomeFeedSkeleton />}>
         <HomeFeed />
       </Suspense>
-
       <TheDaily />
-
       <MissionVisionSection />
     </div>
   );

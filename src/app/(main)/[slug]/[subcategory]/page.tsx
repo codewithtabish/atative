@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { getSubcategoryPageBlogsAction } from "@/app/actions/(category)/get-top-subcategory-blogs-action";
-import { Container } from "@/components/(app)/(common)/layout/container";
 import { SubcategoryBlogData } from "@/components/(app)/(pages)/subcategorypage/subcategory-blog-data";
 import { SubcategoryBlogSkeleton } from "@/components/(app)/(pages)/subcategorypage/subcategory-blog-skeleton";
 
@@ -118,18 +117,16 @@ export default async function SubcategoryPage({ params }: PageProps) {
 
   return (
     <main>
-      <Container>
-        <Suspense
-          key={`${categorySlug}-${subcategorySlug}`}
-          fallback={
-            <div className="pb-12 pt-10 sm:pb-16 sm:pt-12">
-              <SubcategoryBlogSkeleton />
-            </div>
-          }
-        >
-          <SubcategoryBlogData categorySlug={categorySlug} subcategorySlug={subcategorySlug} />
-        </Suspense>
-      </Container>
+      <Suspense
+        key={`${categorySlug}-${subcategorySlug}`}
+        fallback={
+          <div className="pb-12 pt-10 sm:pb-16 sm:pt-12">
+            <SubcategoryBlogSkeleton />
+          </div>
+        }
+      >
+        <SubcategoryBlogData categorySlug={categorySlug} subcategorySlug={subcategorySlug} />
+      </Suspense>
     </main>
   );
 }

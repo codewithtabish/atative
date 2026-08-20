@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 
 import { getTopCategoryPageBlogsAction } from "@/app/actions/(category)/get-top-category-blogs-action";
 
-import { Container } from "@/components/(app)/(common)/layout/container";
 import { CategoryBlogComponent } from "@/components/(app)/(pages)/categorypage/category-blog-comp";
 
 type PageProps = {
@@ -192,43 +191,41 @@ export default async function CategorySlug({ params }: PageProps) {
 
   return (
     <main>
-      <Container>
-        {/* =====================================================
+      {/* =====================================================
             BREADCRUMB
         ===================================================== */}
 
-        <nav aria-label="Breadcrumb" className="pt-8 sm:pt-10">
-          <ol className="flex items-center gap-2 font-sans text-[18px] font-medium">
-            {/* Home */}
+      <nav aria-label="Breadcrumb" className="pt-8 sm:pt-10">
+        <ol className="flex items-center gap-2 font-sans text-[18px] font-medium">
+          {/* Home */}
 
-            <li>
-              <Link href="/" className="text-foreground transition-colors hover:text-primary">
-                Home
-              </Link>
-            </li>
+          <li>
+            <Link href="/" className="text-foreground transition-colors hover:text-primary">
+              Home
+            </Link>
+          </li>
 
-            {/* Arrow */}
+          {/* Arrow */}
 
-            <li aria-hidden="true" className="text-muted-foreground">
-              <ChevronRight className="size-5" />
-            </li>
+          <li aria-hidden="true" className="text-muted-foreground">
+            <ChevronRight className="size-5" />
+          </li>
 
-            {/* Current Category */}
+          {/* Current Category */}
 
-            <li aria-current="page" className="text-primary">
-              {category.name}
-            </li>
-          </ol>
-        </nav>
+          <li aria-current="page" className="text-primary">
+            {category.name}
+          </li>
+        </ol>
+      </nav>
 
-        {/* =====================================================
+      {/* =====================================================
             CATEGORY CONTENT
         ===================================================== */}
 
-        <section className="pb-12 pt-10 sm:pb-16 sm:pt-12">
-          <CategoryBlogComponent category={category} />
-        </section>
-      </Container>
+      <section className="pb-12 pt-10 sm:pb-16 sm:pt-12">
+        <CategoryBlogComponent category={category} />
+      </section>
     </main>
   );
 }

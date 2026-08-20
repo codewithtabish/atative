@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { Container } from "@/components/(app)/(common)/layout/container";
 import { HomePageComp } from "@/components/(app)/(pages)/homepage/home-page-comp";
 
 const siteUrl = "https://www.alentah.com";
@@ -32,11 +31,7 @@ export const metadata: Metadata = {
 };
 
 const HomeScreen = () => {
-  return (
-    <Container className="">
-      <HomePageComp />
-    </Container>
-  );
+  return <HomePageComp />;
 };
 
 export default HomeScreen;
