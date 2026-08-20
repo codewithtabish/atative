@@ -13,8 +13,8 @@ type PageProps = {
 };
 
 const siteUrl = "https://www.alentah.com";
-
-const ogImage = `${siteUrl}/images/og/atative-og.png`;
+const siteName = "Alentah";
+const ogImage = `${siteUrl}/images/og/alentah-og.png`;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -23,7 +23,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!result.success) {
     return {
-      title: "Category Not Found | ATATIVE",
+      title: `Category Not Found | ${siteName}`,
+      description: `The requested category could not be found on ${siteName}.`,
       robots: {
         index: false,
         follow: false,
@@ -32,21 +33,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const category = result.data;
-
   const categoryName = category.name;
 
   const description =
     category.description?.trim() ||
-    `Explore the latest ${categoryName.toLowerCase()} news, guides, trends, tools, analysis, and insights on ATATIVE.`;
+    `Explore the latest ${categoryName.toLowerCase()} news, guides, trends, tools, analysis, and insights on ${siteName}.`;
 
-  const title = `${categoryName} | ATATIVE`;
-
+  const title = `${categoryName} | ${siteName}`;
   const canonicalUrl = `${siteUrl}/${category.slug}`;
 
   return {
     metadataBase: new URL(siteUrl),
 
-    title,
+    title: {
+      absolute: title,
+    },
+
     description,
 
     alternates: {
@@ -69,16 +71,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: "website",
       locale: "en_US",
       url: canonicalUrl,
-      siteName: "ATATIVE",
+      siteName,
       title,
       description,
-
       images: [
         {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: `${categoryName} | ATATIVE`,
+          alt: `${categoryName} | ${siteName}`,
         },
       ],
     },

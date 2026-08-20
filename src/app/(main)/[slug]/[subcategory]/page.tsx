@@ -14,29 +14,18 @@ type PageProps = {
 };
 
 const siteUrl = "https://www.alentah.com";
-
-const ogImage = `${siteUrl}/images/og/atative-og.png`;
-
-/**
- * ============================================================
- * DYNAMIC SUBCATEGORY SEO METADATA
- * ============================================================
- */
+const siteName = "Alentah";
+const ogImage = `${siteUrl}/images/og/alentah-og.png`;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug: categorySlug, subcategory: subcategorySlug } = await params;
 
   const result = await getSubcategoryPageBlogsAction(subcategorySlug);
 
-  /**
-   * ==========================================================
-   * SUBCATEGORY NOT FOUND
-   * ==========================================================
-   */
-
   if (!result.success) {
     return {
-      title: "Subcategory Not Found | ATATIVE",
+      title: `Subcategory Not Found | ${siteName}`,
+      description: `The requested subcategory could not be found on ${siteName}.`,
       robots: {
         index: false,
         follow: false,
@@ -49,70 +38,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const categoryName = subcategory.category.name;
   const subcategoryName = subcategory.name;
 
-  /**
-   * ==========================================================
-   * DYNAMIC TITLE
-   * ==========================================================
-   */
-
   const title = `${subcategoryName} — Latest News, Guides & Insights`;
-
-  /**
-   * ==========================================================
-   * DYNAMIC DESCRIPTION
-   *
-   * Prefer the description stored in the database.
-   * If there is no description, generate one automatically.
-   * ==========================================================
-   */
 
   const description =
     subcategory.description?.trim() ||
-    `Explore the latest ${subcategoryName.toLowerCase()} news, guides, analysis, reviews, and insights from ${categoryName} on ATATIVE.`;
-
-  /**
-   * ==========================================================
-   * DYNAMIC CANONICAL URL
-   *
-   * Example:
-   * https://atative.com/ai/generative-ai
-   * ==========================================================
-   */
+    `Explore the latest ${subcategoryName.toLowerCase()} news, guides, analysis, reviews, and insights from ${categoryName} on ${siteName}.`;
 
   const canonicalUrl = `${siteUrl}/${categorySlug}/${subcategorySlug}`;
 
   return {
-    /**
-     * ========================================================
-     * BASIC SEO
-     * ========================================================
-     */
-
     metadataBase: new URL(siteUrl),
 
-    title,
-    description,
+    title: {
+      absolute: title,
+    },
 
-    /**
-     * ========================================================
-     * CANONICAL
-     * ========================================================
-     */
+    description,
 
     alternates: {
       canonical: canonicalUrl,
     },
 
-    /**
-     * ========================================================
-     * ROBOTS
-     * ========================================================
-     */
-
     robots: {
       index: true,
       follow: true,
-
       googleBot: {
         index: true,
         follow: true,
@@ -122,36 +71,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
 
-    /**
-     * ========================================================
-     * OPEN GRAPH
-     * ========================================================
-     */
-
     openGraph: {
       type: "website",
       locale: "en_US",
       url: canonicalUrl,
-      siteName: "ATATIVE",
-
+      siteName,
       title,
       description,
-
       images: [
         {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: `${subcategoryName} | ATATIVE`,
+          alt: `${subcategoryName} | ${siteName}`,
         },
       ],
     },
-
-    /**
-     * ========================================================
-     * TWITTER / X
-     * ========================================================
-     */
 
     twitter: {
       card: "summary_large_image",
@@ -162,20 +97,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-/**
- * ============================================================
- * SUBCATEGORY PAGE
- * ============================================================
- */
-
 export default async function SubcategoryPage({ params }: PageProps) {
   const { slug: categorySlug, subcategory: subcategorySlug } = await params;
-
-  /**
-   * ==========================================================
-   * VALIDATE SUBCATEGORY
-   * ==========================================================
-   */
 
   const result = await getSubcategoryPageBlogsAction(subcategorySlug);
 
