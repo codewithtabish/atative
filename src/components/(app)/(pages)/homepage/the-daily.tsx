@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { subscribeNewsletterAction } from "@/app/actions/(newsletter)/subscribe-newsletter-action";
 
+import { KineticText } from "@/components/ui/kinetic-text";
 import {
   FacebookIcon,
   GithubIcon,
@@ -335,10 +336,11 @@ export default function TheDaily() {
             <div className="mt-4">
               <div className="flex items-center justify-center gap-2 md:justify-start">
                 <h3 className="relative inline-block text-xl font-semibold tracking-tight">
-                  <span className="relative z-10">Talha Tabish</span>
+                  {/* <span className="relative z-10">Talha Tabish</span> */}
 
                   <span className="absolute bottom-1 left-0 z-0 h-2.5 w-full bg-primary/40" />
                 </h3>
+                <KineticText text="TALHA TABISH" as="h2" className="relative z-10" />
 
                 <div className="relative" ref={socialRef}>
                   <button

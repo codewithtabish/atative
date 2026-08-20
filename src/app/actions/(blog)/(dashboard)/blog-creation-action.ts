@@ -1,11 +1,16 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+
 import { revalidatePath, revalidateTag } from "next/cache";
+
 import { OpenAI } from "openai";
 
 import { CACHE_TAGS } from "@/lib/cache-keys";
+
 import prisma from "@/lib/prisam-client";
+
+import { pingIndexNow } from "@/lib/index-now";
 import { CreateBlogInput, CreateBlogResult } from "@/schemas/blog-schema";
 
 const openai = new OpenAI({
@@ -91,6 +96,7 @@ async function generateSEOWithAI(title: string, contentText: string) {
           content: `You are an expert SEO specialist. Generate professional SEO metadata and a short description.
 
 STRICT RULES:
+
 - DO NOT change the title
 - shortDescription: 1-2 sentences, max 160 characters
 - metaTitle under 60 characters
@@ -114,6 +120,7 @@ STRICT RULES:
           content: `Blog Title: ${title}
 
 Blog Content:
+
 ${contentText.slice(0, 3500)}`,
         },
       ],
@@ -285,36 +292,28 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
 
     // ========================================================
     // VALIDATE CATEGORY + SUBCATEGORY
-    //
-    // We intentionally fetch the category/subcategory here.
-    //
-    // This is NOT for the public blog page.
-    //
-    // It is required during blog creation to:
-    //
-    // 1. Validate that the relationship is correct.
-    // 2. Get category.slug.
-    // 3. Get subcategory.slug.
-    // 4. Build the canonical URL.
-    // 5. Invalidate the correct category cache.
-    // 6. Invalidate the correct subcategory cache.
     // ========================================================
 
     const subcategory = await prisma.subcategory.findFirst({
       where: {
         id: data.subcategoryId,
+
         categoryId: data.categoryId,
+
         isActive: true,
       },
 
       select: {
         id: true,
+
         slug: true,
 
         category: {
           select: {
             id: true,
+
             slug: true,
+
             isActive: true,
           },
         },
@@ -329,6 +328,7 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
     }
 
     const categorySlug = subcategory.category.slug;
+
     const subcategorySlug = subcategory.slug;
 
     // ========================================================
@@ -343,22 +343,6 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
 
     // ========================================================
     // CANONICAL URL
-    //
-    // New URL structure:
-    //
-    // /{category}/{subcategory}/{blog}
-    //
-    // Example:
-    //
-    // https://www.alentah.com/
-    // ai/
-    // generative-ai/
-    // what-are-large-language-models-llms
-    //
-    // Result:
-    //
-    // https://www.alentah.com/ai/generative-ai/
-    // what-are-large-language-models-llms
     // ========================================================
 
     const canonicalUrl = buildBlogUrl(categorySlug, subcategorySlug, slug);
@@ -461,13 +445,13 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
 
     // --------------------------------------------------------
     // PUBLIC CONTENT
-    //
-    // Drafts do not affect public caches.
-    // Published blogs do.
     // --------------------------------------------------------
 
     if (isPublished) {
-      // Homepage
+      // ------------------------------------------------------
+      // HOMEPAGE
+      // ------------------------------------------------------
+
       revalidatePath("/");
 
       revalidateTag(CACHE_TAGS.home, "max");
@@ -476,16 +460,12 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
 
       // ------------------------------------------------------
       // CATEGORY PAGE
-      //
-      // /ai
       // ------------------------------------------------------
 
       revalidateTag(CACHE_TAGS.categoryPageBlogs(categorySlug), "max");
 
       // ------------------------------------------------------
       // SUBCATEGORY PAGE
-      //
-      // /ai/generative-ai
       // ------------------------------------------------------
 
       revalidateTag(CACHE_TAGS.subcategoryPageBlogs(subcategorySlug), "max");
@@ -498,12 +478,20 @@ export async function createBlogAction(data: CreateBlogInput): Promise<CreateBlo
 
       // ------------------------------------------------------
       // EXACT BLOG PATH
-      //
-      // This ensures the new hierarchical route is
-      // invalidated as well.
       // ------------------------------------------------------
 
       revalidatePath(blogPath);
+
+      // ------------------------------------------------------
+      // INDEXNOW
+      //
+      // Notify IndexNow-compatible search engines
+      // that this new public URL is available.
+      //
+      // This does NOT directly submit the URL to Google.
+      // ------------------------------------------------------
+
+      await pingIndexNow(blogPath);
     }
 
     // ========================================================

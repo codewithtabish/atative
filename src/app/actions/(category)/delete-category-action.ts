@@ -3,9 +3,12 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+
 import { revalidatePath, revalidateTag } from "next/cache";
 
 import { CACHE_TAGS } from "@/lib/cache-keys";
+
+import { pingIndexNow } from "@/lib/index-now";
 import prisma from "@/lib/prisam-client";
 
 type DeleteCategoryResult =
@@ -16,6 +19,8 @@ type DeleteCategoryResult =
       success: false;
       error: string;
     };
+
+const SITE_URL = "https://www.alentah.com";
 
 export async function deleteCategoryAction(categoryId: string): Promise<DeleteCategoryResult> {
   // ============================================================
@@ -74,6 +79,7 @@ export async function deleteCategoryAction(categoryId: string): Promise<DeleteCa
       },
       select: {
         id: true,
+        slug: true,
         editorId: true,
       },
     });
@@ -85,6 +91,9 @@ export async function deleteCategoryAction(categoryId: string): Promise<DeleteCa
       };
     }
 
+    // Save the public URL before deleting the category.
+    const categoryUrl = `${SITE_URL}/${category.slug}`;
+
     // ============================================================
     // 5. DELETE CATEGORY
     //
@@ -94,10 +103,6 @@ export async function deleteCategoryAction(categoryId: string): Promise<DeleteCa
     //
     // Does NOT delete:
     // - Editor
-    //
-    // Because Category.editorId belongs to the Category row,
-    // deleting the Category automatically removes that
-    // category-editor association.
     // ============================================================
 
     await prisma.$transaction([
@@ -118,20 +123,22 @@ export async function deleteCategoryAction(categoryId: string): Promise<DeleteCa
     // 6. REVALIDATE CACHE
     // ============================================================
 
-    // Category list changed.
     revalidateTag(CACHE_TAGS.categories, "max");
 
-    // Editor/category assignment data may have changed.
     revalidateTag(CACHE_TAGS.editors, "max");
 
-    // Dashboard category page.
     revalidatePath("/dashboard/category");
 
-    // Editor management page/list.
     revalidatePath("/dashboard/editors");
 
     // ============================================================
-    // 7. SUCCESS
+    // 7. NOTIFY INDEXNOW
+    // ============================================================
+
+    await pingIndexNow(categoryUrl);
+
+    // ============================================================
+    // 8. SUCCESS
     // ============================================================
 
     return {

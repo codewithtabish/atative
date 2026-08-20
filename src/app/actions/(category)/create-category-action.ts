@@ -1,29 +1,45 @@
 // src/app/actions/category.ts
+
 "use server";
 
-import { CACHE_TAGS } from "@/lib/cache-keys";
-import prisma from "@/lib/prisam-client";
-import { categorySchema } from "@/schemas/category-schema";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath, revalidateTag } from "next/cache";
+
+import { CACHE_TAGS } from "@/lib/cache-keys";
+import { pingIndexNow } from "@/lib/index-now";
+import prisma from "@/lib/prisam-client";
+import { categorySchema } from "@/schemas/category-schema";
 
 type CreateCategoryResult =
   { success: true; categoryId: string } | { success: false; error: string };
 
 export async function createCategoryAction(formData: unknown): Promise<CreateCategoryResult> {
-  // ── Auth guard (defense-in-depth alongside middleware) ──
+  // ── Auth guard ──────────────────────────────────────────────
   const { userId } = await auth();
+
   if (!userId) {
-    return { success: false, error: "You must be signed in." };
+    return {
+      success: false,
+      error: "You must be signed in.",
+    };
   }
 
-  const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
+  const dbUser = await prisma.user.findUnique({
+    where: {
+      clerkId: userId,
+    },
+  });
+
   if (!dbUser || dbUser.role !== "ADMIN") {
-    return { success: false, error: "You are not authorized to do this." };
+    return {
+      success: false,
+      error: "You are not authorized to do this.",
+    };
   }
 
-  // ── Validate input on the server too — never trust the client ──
+  // ── Validate input ─────────────────────────────────────────
   const parsed = categorySchema.safeParse(formData);
+
   if (!parsed.success) {
     return {
       success: false,
@@ -34,7 +50,13 @@ export async function createCategoryAction(formData: unknown): Promise<CreateCat
   const { name, slug, description, isActive, sortOrder } = parsed.data;
 
   try {
-    const existing = await prisma.category.findUnique({ where: { slug } });
+    // ── Check duplicate slug ─────────────────────────────────
+    const existing = await prisma.category.findUnique({
+      where: {
+        slug,
+      },
+    });
+
     if (existing) {
       return {
         success: false,
@@ -42,6 +64,7 @@ export async function createCategoryAction(formData: unknown): Promise<CreateCat
       };
     }
 
+    // ── Create category ───────────────────────────────────────
     const category = await prisma.category.create({
       data: {
         name,
@@ -51,13 +74,28 @@ export async function createCategoryAction(formData: unknown): Promise<CreateCat
         sortOrder,
       },
     });
-    revalidateTag(CACHE_TAGS.categories, "max");
-    revalidatePath("/dashboard/items/create-category");
-    revalidatePath("/dashboard"); // wherever your category list lives
 
-    return { success: true, categoryId: category.id };
+    // ── Revalidate cache ──────────────────────────────────────
+    revalidateTag(CACHE_TAGS.categories, "max");
+
+    revalidatePath("/dashboard/items/create-category");
+    revalidatePath("/dashboard");
+
+    // ── Notify IndexNow ────────────────────────────────────────
+    if (isActive) {
+      await pingIndexNow(`/${category.slug}`);
+    }
+
+    return {
+      success: true,
+      categoryId: category.id,
+    };
   } catch (err) {
     console.error("[createCategory] Error:", err);
-    return { success: false, error: "Something went wrong. Try again." };
+
+    return {
+      success: false,
+      error: "Something went wrong. Try again.",
+    };
   }
 }

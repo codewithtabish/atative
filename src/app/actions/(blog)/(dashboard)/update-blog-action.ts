@@ -3,18 +3,23 @@
 "use server";
 
 import { auth } from "@clerk/nextjs/server";
+
 import { revalidatePath, revalidateTag } from "next/cache";
+
 import { OpenAI } from "openai";
 
 import { CACHE_TAGS } from "@/lib/cache-keys";
+
 import prisma from "@/lib/prisam-client";
+
+import { pingIndexNow } from "@/lib/index-now";
 import { TableOfContentsItem } from "@/schemas/blog-schema";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.alentah.com";
 
 // ============================================================
 // INPUT / OUTPUT TYPES
@@ -100,7 +105,6 @@ function extractTextFromContent(content: any): string {
 
 function estimateReadingTime(content: any): number {
   const text = extractTextFromContent(content);
-
   const words = text.trim().split(/\s+/).filter(Boolean).length;
 
   return Math.max(1, Math.ceil(words / 200));
@@ -114,14 +118,13 @@ async function generateSEOWithAI(title: string, contentText: string) {
   try {
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-
       messages: [
         {
           role: "system",
-
           content: `You are an expert SEO specialist. Generate professional SEO metadata and a short description.
 
 STRICT RULES:
+
 - DO NOT change the title
 - shortDescription: 1-2 sentences, max 160 characters
 - metaTitle under 60 characters
@@ -138,17 +141,15 @@ STRICT RULES:
   "summary": "2-3 sentence summary"
 }`,
         },
-
         {
           role: "user",
-
           content: `Blog Title: ${title}
 
 Blog Content:
+
 ${contentText.slice(0, 3500)}`,
         },
       ],
-
       temperature: 0.7,
       max_tokens: 1200,
     });
@@ -231,7 +232,6 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
       where: {
         clerkId,
       },
-
       select: {
         id: true,
       },
@@ -305,12 +305,24 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
       where: {
         id: data.id,
       },
-
       select: {
         id: true,
         slug: true,
+        status: true,
         categoryId: true,
         subcategoryId: true,
+
+        category: {
+          select: {
+            slug: true,
+          },
+        },
+
+        subcategory: {
+          select: {
+            slug: true,
+          },
+        },
       },
     });
 
@@ -322,6 +334,14 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
     }
 
     // ========================================================
+    // SAVE OLD PUBLIC URL
+    // ========================================================
+
+    const oldBlogUrl =
+      `${BASE_URL}/${existingBlog.category.slug}/` +
+      `${existingBlog.subcategory.slug}/${existingBlog.slug}`;
+
+    // ========================================================
     // DUPLICATE SLUG CHECK
     // ========================================================
 
@@ -331,12 +351,10 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
       const slugTaken = await prisma.blog.findFirst({
         where: {
           slug: newSlug,
-
           NOT: {
             id: data.id,
           },
         },
-
         select: {
           id: true,
         },
@@ -352,10 +370,6 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
 
     // ========================================================
     // VALIDATE CATEGORY + SUBCATEGORY
-    //
-    // We need both slugs because the public URL is:
-    //
-    // /category/subcategory/blog-slug
     // ========================================================
 
     const subcategory = await prisma.subcategory.findFirst({
@@ -364,7 +378,6 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
         categoryId: data.categoryId,
         isActive: true,
       },
-
       select: {
         id: true,
         slug: true,
@@ -391,18 +404,13 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
     // ========================================================
 
     const categorySlug = subcategory.category.slug;
-
     const subcategorySlug = subcategory.slug;
 
     // ========================================================
     // CANONICAL URL
-    //
-    // Final public URL:
-    //
-    // https://www.alentah.com/ai/generative-ai/blog-slug
     // ========================================================
 
-    const canonicalUrl = `${BASE_URL}/${categorySlug}/${subcategorySlug}/${newSlug}`;
+    const canonicalUrl = `${BASE_URL}/${categorySlug}/` + `${subcategorySlug}/${newSlug}`;
 
     // ========================================================
     // CONTENT + SEO
@@ -453,7 +461,8 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
         featured: data.featured ?? false,
 
         publishedAt: isPublished
-          ? existingBlog.categoryId !== data.categoryId ||
+          ? existingBlog.status !== "PUBLISHED" ||
+            existingBlog.categoryId !== data.categoryId ||
             existingBlog.subcategoryId !== data.subcategoryId ||
             existingBlog.slug !== newSlug
             ? new Date()
@@ -533,104 +542,97 @@ export async function updateBlogAction(data: UpdateBlogInput): Promise<UpdateBlo
     });
 
     // ========================================================
+    // CURRENT BLOG URL
+    // ========================================================
+
+    const newBlogUrl = canonicalUrl;
+
+    // ========================================================
     // CACHE REVALIDATION
     // ========================================================
 
-    // --------------------------------------------------------
     // Dashboard
-    // --------------------------------------------------------
-
     revalidatePath("/dashboard/blogs");
 
     revalidateTag(CACHE_TAGS.dashboardBlogs, "max");
 
-    // --------------------------------------------------------
     // Homepage
-    // --------------------------------------------------------
-
     revalidatePath("/");
 
     revalidateTag(CACHE_TAGS.home, "max");
 
     revalidateTag(CACHE_TAGS.homeScreen, "max");
 
-    // --------------------------------------------------------
-    // CURRENT CATEGORY PAGE
-    // --------------------------------------------------------
+    // Current category
+    revalidatePath(`/${categorySlug}`);
 
     revalidateTag(CACHE_TAGS.categoryPageBlogs(categorySlug), "max");
 
-    // --------------------------------------------------------
-    // CURRENT SUBCATEGORY PAGE
-    // --------------------------------------------------------
+    // Current subcategory
+    revalidatePath(`/${categorySlug}/${subcategorySlug}`);
 
     revalidateTag(CACHE_TAGS.subcategoryPageBlogs(subcategorySlug), "max");
 
-    // --------------------------------------------------------
-    // CURRENT BLOG
-    // --------------------------------------------------------
+    // Current blog
+    revalidatePath(`/${categorySlug}/${subcategorySlug}/${newSlug}`);
 
     revalidateTag(CACHE_TAGS.blog(blog.slug), "max");
 
-    // --------------------------------------------------------
-    // OLD BLOG URL
-    //
-    // Important if slug changed.
-    // --------------------------------------------------------
+    // ========================================================
+    // OLD BLOG URL / CACHE
+    // ========================================================
 
-    if (existingBlog.slug !== blog.slug) {
+    const blogUrlChanged =
+      existingBlog.slug !== newSlug ||
+      existingBlog.categoryId !== data.categoryId ||
+      existingBlog.subcategoryId !== data.subcategoryId;
+
+    if (blogUrlChanged) {
+      revalidatePath(oldBlogUrl);
+
       revalidateTag(CACHE_TAGS.blog(existingBlog.slug), "max");
     }
 
-    // --------------------------------------------------------
+    // ========================================================
     // OLD CATEGORY CACHE
-    //
-    // Important if category was changed.
-    // --------------------------------------------------------
+    // ========================================================
 
     if (existingBlog.categoryId !== data.categoryId) {
-      const oldCategory = await prisma.category.findUnique({
-        where: {
-          id: existingBlog.categoryId,
-        },
+      revalidateTag(CACHE_TAGS.categoryPageBlogs(existingBlog.category.slug), "max");
 
-        select: {
-          slug: true,
-        },
-      });
-
-      if (oldCategory) {
-        revalidateTag(CACHE_TAGS.categoryPageBlogs(oldCategory.slug), "max");
-      }
+      revalidatePath(`/${existingBlog.category.slug}`);
     }
 
-    // --------------------------------------------------------
+    // ========================================================
     // OLD SUBCATEGORY CACHE
-    //
-    // Important if subcategory was changed.
-    // --------------------------------------------------------
+    // ========================================================
 
     if (existingBlog.subcategoryId !== data.subcategoryId) {
-      const oldSubcategory = await prisma.subcategory.findUnique({
-        where: {
-          id: existingBlog.subcategoryId,
-        },
+      revalidateTag(CACHE_TAGS.subcategoryPageBlogs(existingBlog.subcategory.slug), "max");
 
-        select: {
-          slug: true,
-        },
-      });
-
-      if (oldSubcategory) {
-        revalidateTag(CACHE_TAGS.subcategoryPageBlogs(oldSubcategory.slug), "max");
-      }
+      revalidatePath(`/${existingBlog.category.slug}/${existingBlog.subcategory.slug}`);
     }
 
-    // --------------------------------------------------------
+    // ========================================================
     // COMMENTS
-    // --------------------------------------------------------
+    // ========================================================
 
     revalidateTag(CACHE_TAGS.comments(blog.id), "max");
+
+    // ========================================================
+    // INDEXNOW
+    // ========================================================
+
+    if (isPublished) {
+      // Notify IndexNow about the current/new URL.
+      await pingIndexNow(newBlogUrl);
+
+      // If the public URL changed, notify IndexNow
+      // about the old URL as well.
+      if (blogUrlChanged && existingBlog.status === "PUBLISHED") {
+        await pingIndexNow(oldBlogUrl);
+      }
+    }
 
     // ========================================================
     // RESPONSE

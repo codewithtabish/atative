@@ -125,10 +125,10 @@ const COMPANY_LINKS = [
     href: "/about",
   },
 
-  // {
-  // label: "Newsletter",
-  // href: "/newsletter",
-  // },
+  {
+    label: "Contact Us",
+    href: "/contact",
+  },
 ];
 
 const LEGAL_LINKS = [

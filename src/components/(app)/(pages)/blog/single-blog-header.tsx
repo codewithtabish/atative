@@ -1,3 +1,4 @@
+import { KineticText } from "@/components/ui/kinetic-text";
 import { BlogType } from "@/generated/prisma/enums";
 import { CalendarDays, Clock3, UserRound } from "lucide-react";
 import Image from "next/image";
@@ -121,9 +122,13 @@ export default function BlogHeader({
       {/* =====================================================
           TITLE
       ====================================================== */}
-      <h1 className="max-w-5xl text-4xl font-bold leading-[1.05] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-6xl xl:text-[4.25rem]">
-        {title}
-      </h1>
+      {/* <h1 className="max-w-5xl text-4xl font-bold leading-[1.05] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-6xl xl:text-[4.25rem]"> */}
+      <KineticText
+        text={title}
+        as="h1"
+        className="max-w-5xl text-4xl font-bold leading-[1.05] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-6xl xl:text-[4.25rem]"
+      />
+      {/* </h1> */}
 
       {/* =====================================================
           DESCRIPTION
@@ -174,7 +179,7 @@ export default function BlogHeader({
       ====================================================== */}
       <div className="mt-10 sm:mt-12 lg:mt-14">
         <div className="group relative overflow-hidden rounded-2xl border border-border bg-muted shadow-sm sm:rounded-3xl">
-          <div className="relative aspect-[16/9] w-full">
+          <div className="relative aspect-video w-full">
             <Image
               src={bannerImage}
               alt={bannerImageAlt || title}
@@ -185,10 +190,10 @@ export default function BlogHeader({
             />
 
             {/* Image readability overlay */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/5" />
+            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-black/5" />
 
             {/* Bottom subtle vignette */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/15 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/15 to-transparent" />
           </div>
         </div>
 
