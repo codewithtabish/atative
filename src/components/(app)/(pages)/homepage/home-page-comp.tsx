@@ -183,7 +183,7 @@ function HeroSection({ hero, latest }: { hero: HomeBlogListItem; latest: HomeBlo
 
       <article className="group lg:col-span-2">
         <Link href={getArticleUrl(hero.slug)} className="block">
-          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-muted">
+          <div className="relative aspect-16/10 w-full overflow-hidden rounded-lg bg-muted">
             <Image
               src={hero.bannerImage}
               alt={hero.bannerImageAlt ?? hero.title}
@@ -284,7 +284,7 @@ function TrendingSection({ items }: { items: HomeBlogListItem[] }) {
         {items.map((blog) => (
           <article key={blog.id} className="group">
             <Link href={getArticleUrl(blog.slug)} className="block" aria-label={blog.title}>
-              <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md bg-muted">
+              <div className="relative aspect-4/3 w-full overflow-hidden rounded-md bg-muted">
                 <Image
                   src={blog.bannerImage}
                   alt={blog.bannerImageAlt ?? blog.title}
@@ -340,7 +340,7 @@ function FeaturedSection({
 
       <article className="group mt-6">
         <Link href={getArticleUrl(feature.slug)} className="block" aria-label={feature.title}>
-          <div className="relative aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted">
+          <div className="relative aspect-21/9 w-full overflow-hidden rounded-lg bg-muted">
             <Image
               src={feature.bannerImage}
               alt={feature.bannerImageAlt ?? feature.title}
@@ -418,7 +418,7 @@ function EditorialSection({
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
         <article className="group lg:col-span-2">
           <Link href={getArticleUrl(feature.slug)} className="block" aria-label={feature.title}>
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted">
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
               <Image
                 src={feature.bannerImage}
                 alt={feature.bannerImageAlt ?? feature.title}

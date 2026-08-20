@@ -44,6 +44,10 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
+
   "editor.codeActions.triggerOnFocusChange": true,
-  "WillLuke.nextjs.hasPrompted": true
+  "WillLuke.nextjs.hasPrompted": true,
+
+  // Tailwind Warning Auto-Fix
+  "tailwindAutoOptimizer.autoFixOnSave": true
 }

@@ -46,7 +46,7 @@ function TrendingCard({ blog }: { blog: HomeBlogListItem }) {
       href={blogHref(blog)}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-4/3 overflow-hidden">
         <Image
           src={blog.bannerImage}
           alt={blog.bannerImageAlt || blog.title}
@@ -55,7 +55,7 @@ function TrendingCard({ blog }: { blog: HomeBlogListItem }) {
           sizes="(max-width: 768px) 100vw, 25vw"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-zinc-900 backdrop-blur">
           {blog.category.name}
@@ -85,7 +85,7 @@ function CategoryArticle({ blog, large = false }: { blog: HomeBlogListItem; larg
     >
       <div
         className={`relative overflow-hidden rounded-xl ${
-          large ? "aspect-[16/10] w-full" : "h-20 w-28 shrink-0"
+          large ? "aspect-16/10 w-full" : "h-20 w-28 shrink-0"
         }`}
       >
         <Image
@@ -172,7 +172,7 @@ export default async function HomeBlog() {
                 href={blogHref(hero)}
                 className="group relative block overflow-hidden rounded-3xl"
               >
-                <div className="relative aspect-[16/10] w-full">
+                <div className="relative aspect-16/10 w-full">
                   <Image
                     src={hero.bannerImage}
                     alt={hero.bannerImageAlt || hero.title}
@@ -299,7 +299,7 @@ export default async function HomeBlog() {
               Array.from({ length: 4 - blogs.length }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
-                  className="flex aspect-[3/4] items-center justify-center rounded-2xl border border-dashed border-border"
+                  className="flex aspect-3/4 items-center justify-center rounded-2xl border border-dashed border-border"
                 >
                   <span className="text-xs text-muted-foreground">Coming soon</span>
                 </div>

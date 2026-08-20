@@ -175,7 +175,7 @@ function HeroVisual() {
         }}
       />
       {/* Floating card 1 */}
-      <div className="absolute top-8 left-8 w-44 rounded-xl border border-border bg-card p-4 shadow-sm rotate-[-6deg]">
+      <div className="absolute top-8 left-8 w-44 rounded-xl border border-border bg-card p-4 shadow-sm -rotate-6">
         <div className="mb-2 h-1.5 w-10 rounded-full bg-primary/30" />
         <div className="mb-1.5 h-1.5 w-full rounded-full bg-muted" />
         <div className="mb-1.5 h-1.5 w-5/6 rounded-full bg-muted" />
@@ -188,7 +188,7 @@ function HeroVisual() {
         <div className="mt-1 h-1 w-3/4 rounded-full bg-muted" />
       </div>
       {/* Floating card 3 */}
-      <div className="absolute bottom-20 left-16 w-36 rounded-xl border border-border bg-card p-3 shadow-sm rotate-[3deg]">
+      <div className="absolute bottom-20 left-16 w-36 rounded-xl border border-border bg-card p-3 shadow-sm rotate-3">
         <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
           Robotics
         </span>
@@ -196,7 +196,7 @@ function HeroVisual() {
         <div className="mt-1 h-1 w-2/3 rounded-full bg-muted" />
       </div>
       {/* Connection line */}
-      <div className="absolute top-20 left-32 h-24 w-px bg-gradient-to-b from-primary/20 to-transparent rotate-[25deg]" />
+      <div className="absolute top-20 left-32 h-24 w-px bg-linear-to-b from-primary/20 to-transparent rotate-25" />
     </div>
   );
 }
@@ -217,6 +217,7 @@ export async function AboutPage() {
         {/* ========================================================= */}
         <section className="relative mb-24 md:mb-32" aria-labelledby="about-hero-heading">
           <HeroVisual />
+
           <div className="relative z-10 max-w-3xl">
             <Eyebrow>About Alentah</Eyebrow>
             <h1
@@ -233,14 +234,14 @@ export async function AboutPage() {
             <div className="mt-10 flex flex-wrap gap-3">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-primary"
               >
                 Explore stories
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <a
                 href="#editorial-team"
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline focus-visible:outline-primary"
               >
                 Meet the editors
               </a>
@@ -397,10 +398,10 @@ export async function AboutPage() {
               {activeEditors.map((editor) => (
                 <article
                   key={editor.id}
-                  className="group flex flex-col rounded-2xl border border-border bg-card text-card-foreground transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+                  className="group flex flex-col rounded-2xl border bg-linear-to-r-card text-card-foreground transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
                 >
                   {/* Top accent */}
-                  <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <div className="absolute left-0 top-0 h-px w-full bg-linear-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                   <div className="p-6 md:p-7">
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-start">

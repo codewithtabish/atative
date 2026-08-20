@@ -1,5 +1,6 @@
 "use client";
 
+import { subscribeNewsletterAction } from "@/app/actions/(newsletter)/subscribe-newsletter-action";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -15,68 +16,235 @@ import confetti from "canvas-confetti";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+const NEWSLETTER_SUBSCRIBED_KEY = "alentah_newsletter_subscribed";
 const POPUP_DISMISSED_KEY = "alentah_newsletter_popup_dismissed";
+const NEWSLETTER_SUBSCRIBED_EVENT = "alentah:newsletter-subscribed";
+
+/**
+ * Normalize an email before storing/comparing it.
+ */
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+/**
+ * Get all locally subscribed newsletter emails.
+ *
+ * The current format is:
+ *
+ * ["email@example.com", "another@example.com"]
+ *
+ * The old boolean format ("true") is also handled safely.
+ */
+function getSubscribedEmails(): string[] {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const stored = localStorage.getItem(NEWSLETTER_SUBSCRIBED_KEY);
+
+    if (!stored) {
+      return [];
+    }
+
+    /**
+     * Backward compatibility with the previous implementation.
+     *
+     * Previously the popup stored:
+     *
+     * "true"
+     *
+     * We cannot know which email was subscribed from that value,
+     * so we simply ignore it and use the new email-array format.
+     */
+    if (stored === "true") {
+      return [];
+    }
+
+    const parsed: unknown = JSON.parse(stored);
+
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .filter((value): value is string => typeof value === "string")
+      .map(normalizeEmail)
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Check whether at least one email has subscribed.
+ *
+ * This is used by the popup because the popup should disappear
+ * after a successful newsletter subscription on this browser.
+ */
+function hasAnySubscription() {
+  return getSubscribedEmails().length > 0;
+}
+
+/**
+ * Save a subscribed email without deleting existing emails.
+ */
+function saveSubscribedEmail(email: string) {
+  const normalizedEmail = normalizeEmail(email);
+
+  if (!normalizedEmail) {
+    return;
+  }
+
+  const existingEmails = getSubscribedEmails();
+
+  if (existingEmails.some((existingEmail) => normalizeEmail(existingEmail) === normalizedEmail)) {
+    return;
+  }
+
+  localStorage.setItem(
+    NEWSLETTER_SUBSCRIBED_KEY,
+    JSON.stringify([...existingEmails, normalizedEmail]),
+  );
+}
+
+/**
+ * Get initial popup dismissal state.
+ *
+ * Dismissal only lasts for the current browser session.
+ */
+function getInitialDismissedState() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return sessionStorage.getItem(POPUP_DISMISSED_KEY) === "true";
+}
+
+/**
+ * Get initial subscription state.
+ *
+ * The popup only needs to know whether this browser has
+ * at least one successfully subscribed email.
+ */
+function getInitialSubscribedState() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return hasAnySubscription();
+}
+
+function fireConfetti() {
+  confetti({
+    particleCount: 140,
+    spread: 85,
+    startVelocity: 30,
+    origin: {
+      x: 0.5,
+      y: 0.5,
+    },
+    colors: [
+      "hsl(var(--primary))",
+      "hsl(var(--foreground))",
+      "#22c55e",
+      "#4ade80",
+      "#86efac",
+      "#ffffff",
+    ],
+  });
+}
 
 export default function ExitIntentPopup() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  /*
-   * ============================================================
-   * CHECK IF POPUP WAS ALREADY DISMISSED IN THIS TAB
-   * ============================================================
+  /**
+   * True when this browser has at least one newsletter subscription.
    */
+  const [subscribed, setSubscribed] = useState(getInitialSubscribedState);
 
-  const [dismissed, setDismissed] = useState(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
+  /**
+   * Popup dismissal only lasts for the current session.
+   */
+  const [dismissed, setDismissed] = useState(getInitialDismissedState);
 
-    return sessionStorage.getItem(POPUP_DISMISSED_KEY) === "true";
-  });
-
-  /*
-   * ============================================================
-   * DISMISS FOR THIS TAB / SESSION
+  /**
+   * Listen for newsletter subscriptions made by:
    *
-   * sessionStorage disappears when the browser tab/session ends.
-   * ============================================================
+   * - The Daily
+   * - this popup
+   * - another component in the same tab
+   * - another browser tab/window
+   *
+   * The custom event handles the SAME tab.
+   * The storage event handles OTHER tabs.
    */
-
-  const dismissForSession = () => {
-    sessionStorage.setItem(POPUP_DISMISSED_KEY, "true");
-    setDismissed(true);
-    setOpen(false);
-  };
-
-  /*
-   * ============================================================
-   * EXIT INTENT + MOBILE
-   * ============================================================
-   */
-
   useEffect(() => {
-    if (dismissed) return;
+    const handleNewsletterSubscribed = () => {
+      setSubscribed(true);
+      setDismissed(true);
+      setOpen(false);
+    };
 
-    /*
-     * DESKTOP EXIT INTENT
-     */
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== NEWSLETTER_SUBSCRIBED_KEY) {
+        return;
+      }
 
-    const handleMouseLeave = (event: MouseEvent) => {
-      if (event.clientY <= 5 && !open) {
-        setOpen(true);
+      const hasSubscription = getSubscribedEmails().length > 0;
+
+      if (hasSubscription) {
+        setSubscribed(true);
+        setDismissed(true);
+        setOpen(false);
       }
     };
 
-    document.addEventListener("mouseout", handleMouseLeave);
+    window.addEventListener(NEWSLETTER_SUBSCRIBED_EVENT, handleNewsletterSubscribed);
 
-    /*
-     * MOBILE
-     *
-     * Touch devices do not have desktop exit intent,
-     * so show once after 5 seconds.
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.removeEventListener(NEWSLETTER_SUBSCRIBED_EVENT, handleNewsletterSubscribed);
+
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
+
+  /**
+   * Exit intent + mobile trigger.
+   *
+   * We intentionally do not synchronously call setState
+   * from the effect body.
+   */
+  useEffect(() => {
+    if (dismissed || subscribed) {
+      return;
+    }
+
+    /**
+     * If there is already a subscription, do not register
+     * the popup triggers.
      */
+    if (hasAnySubscription()) {
+      return;
+    }
+
+    const handleMouseLeave = (event: MouseEvent) => {
+      const isSubscribed = hasAnySubscription();
+      const isDismissed = sessionStorage.getItem(POPUP_DISMISSED_KEY) === "true";
+
+      if (isSubscribed || isDismissed || event.clientY > 5) {
+        return;
+      }
+
+      setOpen(true);
+    };
+
+    document.addEventListener("mouseout", handleMouseLeave);
 
     let mobileTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -84,9 +252,15 @@ export default function ExitIntentPopup() {
 
     if (isTouchDevice) {
       mobileTimer = setTimeout(() => {
-        if (!dismissed) {
-          setOpen(true);
+        const isSubscribed = hasAnySubscription();
+
+        const isDismissed = sessionStorage.getItem(POPUP_DISMISSED_KEY) === "true";
+
+        if (isSubscribed || isDismissed) {
+          return;
         }
+
+        setOpen(true);
       }, 5000);
     }
 
@@ -97,120 +271,167 @@ export default function ExitIntentPopup() {
         clearTimeout(mobileTimer);
       }
     };
-  }, [dismissed, open]);
+  }, [dismissed, subscribed]);
 
-  /*
-   * ============================================================
-   * DIALOG OPEN / CLOSE
-   *
-   * Any user-initiated close counts as dismissed:
-   * - X
-   * - No thanks
-   * - Escape
-   * - clicking outside
-   * ============================================================
+  /**
+   * Dismiss popup for the current session.
    */
+  const dismissForSession = () => {
+    sessionStorage.setItem(POPUP_DISMISSED_KEY, "true");
 
+    setDismissed(true);
+    setOpen(false);
+  };
+
+  /**
+   * Handle Radix Dialog open state.
+   */
   const handleDialogChange = (nextOpen: boolean) => {
-    if (nextOpen) {
-      setOpen(true);
+    if (!nextOpen) {
+      if (open) {
+        dismissForSession();
+      }
+
       return;
     }
 
-    if (open) {
-      dismissForSession();
-    }
-  };
-
-  /*
-   * ============================================================
-   * CONFETTI
-   * ============================================================
-   */
-
-  const fireConfetti = () => {
-    confetti({
-      particleCount: 140,
-      spread: 85,
-      startVelocity: 30,
-      origin: {
-        x: 0.5,
-        y: 0.5,
-      },
-      colors: [
-        "hsl(var(--primary))",
-        "hsl(var(--foreground))",
-        "#22c55e",
-        "#4ade80",
-        "#86efac",
-        "#ffffff",
-      ],
-    });
-  };
-
-  /*
-   * ============================================================
-   * SUBSCRIBE
-   * ============================================================
-   */
-
-  const handleSubscribe = async () => {
-    const trimmedEmail = email.trim();
-
-    /*
-     * Do NOT dismiss if email is invalid.
+    /**
+     * Never allow opening if a subscription already exists.
      */
+    if (subscribed || hasAnySubscription()) {
+      setOpen(false);
+      return;
+    }
 
+    /**
+     * Never reopen after session dismissal.
+     */
+    const isDismissed = sessionStorage.getItem(POPUP_DISMISSED_KEY) === "true";
+
+    if (dismissed || isDismissed) {
+      setOpen(false);
+      return;
+    }
+
+    setOpen(true);
+  };
+
+  /**
+   * Mark this browser as subscribed.
+   *
+   * IMPORTANT:
+   * We save the actual email rather than "true".
+   *
+   * This allows The Daily to recognize the exact email.
+   */
+  const markAsSubscribed = (subscribedEmail: string) => {
+    saveSubscribedEmail(subscribedEmail);
+
+    /**
+     * Native storage events do NOT fire in the same tab.
+     *
+     * This custom event makes The Daily update immediately.
+     */
+    window.dispatchEvent(new Event(NEWSLETTER_SUBSCRIBED_EVENT));
+
+    sessionStorage.setItem(POPUP_DISMISSED_KEY, "true");
+
+    setSubscribed(true);
+    setDismissed(true);
+    setOpen(false);
+  };
+
+  /**
+   * Subscribe.
+   */
+  const handleSubscribe = async () => {
+    if (loading || subscribed) {
+      return;
+    }
+
+    const trimmedEmail = normalizeEmail(email);
+
+    /**
+     * Basic validation.
+     */
     if (!trimmedEmail || !trimmedEmail.includes("@") || !trimmedEmail.includes(".")) {
-      alert("Please enter a valid email address");
+      return;
+    }
+
+    /**
+     * If this exact email already exists locally,
+     * there is no reason to call the server again.
+     */
+    const alreadySubscribed = getSubscribedEmails().some(
+      (storedEmail) => normalizeEmail(storedEmail) === trimmedEmail,
+    );
+
+    if (alreadySubscribed) {
+      markAsSubscribed(trimmedEmail);
       return;
     }
 
     setLoading(true);
 
-    /*
-     * TODO:
-     * Replace this with your real newsletter API.
-     */
+    try {
+      const result = await subscribeNewsletterAction(trimmedEmail);
 
-    await new Promise((resolve) => setTimeout(resolve, 900));
+      /**
+       * Server rejected the request.
+       *
+       * If the server says the email already exists,
+       * we still consider it subscribed locally.
+       */
+      if (!result.success) {
+        const message = result.message?.toLowerCase() ?? "";
 
-    /*
-     * Valid subscription:
-     * dismiss for this tab/session.
-     */
+        const isDuplicate =
+          message.includes("already subscribed") ||
+          message.includes("already a subscriber") ||
+          message.includes("already exists");
 
-    sessionStorage.setItem(POPUP_DISMISSED_KEY, "true");
+        if (isDuplicate) {
+          markAsSubscribed(trimmedEmail);
+        }
 
-    setDismissed(true);
-    setLoading(false);
+        return;
+      }
 
-    fireConfetti();
+      /**
+       * Successful subscription.
+       *
+       * Save the ACTUAL email.
+       */
+      markAsSubscribed(trimmedEmail);
 
-    setOpen(false);
+      setEmail("");
+
+      fireConfetti();
+    } catch (error) {
+      console.error("Newsletter subscription failed:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  /*
-   * ============================================================
-   * DON'T RENDER AFTER DISMISSAL
-   * ============================================================
+  /**
+   * Do not render the popup after:
+   *
+   * - successful subscription
+   * - existing subscription
+   * - session dismissal
    */
-
-  if (dismissed) {
+  if (dismissed || subscribed) {
     return null;
   }
 
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
-      {/* ========================================================
-          BACKDROP
-      ======================================================== */}
-
       <DialogOverlay
         className="
           fixed
           inset-0
-          z-[9998]
+          z-9998
           bg-black/65
           backdrop-blur-[2px]
           data-[state=open]:animate-in
@@ -220,47 +441,33 @@ export default function ExitIntentPopup() {
         "
       />
 
-      {/* ========================================================
-          MODAL
-      ======================================================== */}
-
       <DialogContent
         className="
-          !fixed
-          !left-1/2
-          !top-1/2
-          !z-[9999]
-          !m-0
-          !flex
-          !-translate-x-1/2
-          !-translate-y-1/2
-          !items-center
-          !justify-center
-          !overflow-visible
-          !border-0
-          !bg-transparent
-          !p-0
-          !shadow-none
-          !outline-none
-          !ring-0
-          !max-w-none
-          [&>button]:hidden
+          z-9999!
+          m-0!-1/2!
+          flex!/2!
+          -translate-x-1/2!
+          -translate-y-1/2!
+          items-center!
+          justify-center!/2
+          overflow-visible!
+          border-0!nter
+          bg-transparent!
+          p-0!rflow-visible
+          shadow-none!
+          outline-none!nt
+          ring-0!
+          max-w-none!
+          outline-none!
+          ring-0!none
+          max-w-none!hidden
         "
         style={{
           width: "min(720px, calc(100vw - 36px), calc(100vh - 36px))",
           height: "min(720px, calc(100vw - 36px), calc(100vh - 36px))",
         }}
       >
-        {/* ======================================================
-            POPUP WRAPPER
-        ====================================================== */}
-
         <div className="relative h-full w-full">
-          {/* ====================================================
-              CLOSE BUTTON
-              OUTSIDE THE CIRCLE
-          ==================================================== */}
-
           <button
             type="button"
             aria-label="Close newsletter popup"
@@ -269,7 +476,7 @@ export default function ExitIntentPopup() {
               absolute
               right-[-5px]
               top-[-5px]
-              z-[100]
+              z-100
               flex
               h-10
               w-10
@@ -300,32 +507,24 @@ export default function ExitIntentPopup() {
               className="
                 h-5
                 w-5
-                stroke-[2]
+                stroke-2
                 sm:h-[21px]
                 sm:w-[21px]
               "
             />
           </button>
 
-          {/* ====================================================
-              STATIC CIRCLE BORDER
-          ==================================================== */}
-
           <div
             className="
               absolute
               inset-0
               rounded-full
-              border-[4px]
+              border-4
               border-primary
               bg-background
               shadow-[0_30px_100px_rgba(0,0,0,0.45)]
             "
           />
-
-          {/* ====================================================
-              INNER SURFACE
-          ==================================================== */}
 
           <div
             className="
@@ -340,10 +539,6 @@ export default function ExitIntentPopup() {
               bg-background
             "
           >
-            {/* ==================================================
-                CONTENT
-            ================================================== */}
-
             <div
               className="
                 relative
@@ -357,21 +552,10 @@ export default function ExitIntentPopup() {
                 text-center
               "
             >
-              {/* ==================================================
-                  ALENTAH BRAND
-              ================================================== */}
-
-              <div
-                className="
-                  mb-3
-                  flex
-                  justify-center
-                  sm:mb-4
-                "
-              >
+              <div className="mb-3 flex justify-center sm:mb-4">
                 <div
                   className="
-                    border-y-[2px]
+                    border-y-2
                     border-foreground
                     px-4
                     py-1
@@ -395,10 +579,6 @@ export default function ExitIntentPopup() {
                 </div>
               </div>
 
-              {/* ==================================================
-                  SMALL INTRO
-              ================================================== */}
-
               <p
                 className="
                   mb-2
@@ -415,19 +595,15 @@ export default function ExitIntentPopup() {
                 Stay in the know
               </p>
 
-              {/* ==================================================
-                  MAIN HEADING
-              ================================================== */}
-
               <DialogTitle
                 className="
-                  !mx-auto
-                  !max-w-[500px]
-                  !p-0
-                  !font-black
-                  !leading-[1.02]
-                  !tracking-[-0.045em]
-                  !text-foreground
+                  mx-auto!
+                  max-w-[500px]!
+                  p-0!
+                  font-black!
+                  leading-[1.02]!
+                  tracking-[-0.045em]!
+                  text-foreground!
                 "
                 style={{
                   fontSize: "clamp(1.35rem, 3.2vw, 2.55rem)",
@@ -436,19 +612,15 @@ export default function ExitIntentPopup() {
                 Stay ahead with the latest
               </DialogTitle>
 
-              {/* ==================================================
-                  DESCRIPTION
-              ================================================== */}
-
               <DialogDescription
                 className="
-                  !mx-auto
-                  !mt-3
-                  !max-w-[410px]
-                  !font-medium
-                  !leading-tight
-                  !text-muted-foreground
-                  sm:!mt-4
+                  mx-auto!
+                  mt-3!
+                  max-w-[410px]!
+                  font-medium!
+                  leading-tight!
+                  text-muted-foreground!
+                  sm:mt-4!
                 "
                 style={{
                   fontSize: "clamp(0.78rem, 1.5vw, 1.1rem)",
@@ -457,10 +629,6 @@ export default function ExitIntentPopup() {
                 Get Alentah&apos;s latest stories, guides, reviews, and ideas delivered straight to
                 your inbox.
               </DialogDescription>
-
-              {/* ==================================================
-                  FORM
-              ================================================== */}
 
               <div
                 className="
@@ -471,19 +639,19 @@ export default function ExitIntentPopup() {
                   sm:space-y-3
                 "
               >
-                {/* EMAIL */}
-
                 <Input
                   type="email"
                   autoComplete="email"
                   placeholder="Email address"
                   value={email}
+                  disabled={loading}
                   onChange={(event) => {
                     setEmail(event.target.value);
                   }}
                   onKeyDown={(event) => {
                     if (event.key === "Enter") {
-                      handleSubscribe();
+                      event.preventDefault();
+                      void handleSubscribe();
                     }
                   }}
                   className="
@@ -506,8 +674,6 @@ export default function ExitIntentPopup() {
                   "
                 />
 
-                {/* CHECKBOX */}
-
                 <div
                   className="
                     flex
@@ -520,6 +686,7 @@ export default function ExitIntentPopup() {
                   <Checkbox
                     id="deals"
                     defaultChecked
+                    disabled={loading}
                     className="
                       mt-0.5
                       h-4
@@ -546,12 +713,10 @@ export default function ExitIntentPopup() {
                   </Label>
                 </div>
 
-                {/* BUTTON */}
-
                 <Button
                   type="button"
                   disabled={loading}
-                  onClick={handleSubscribe}
+                  onClick={() => void handleSubscribe()}
                   className="
                     h-10
                     w-full
@@ -574,8 +739,6 @@ export default function ExitIntentPopup() {
                   {loading ? "Subscribing..." : "Sign Me Up"}
                 </Button>
 
-                {/* NO THANKS */}
-
                 <button
                   type="button"
                   onClick={dismissForSession}
@@ -596,23 +759,18 @@ export default function ExitIntentPopup() {
                   No thanks
                 </button>
 
-                {/* ==================================================
-                    LEGAL
-                ================================================== */}
-
                 <p
                   className="
                     mx-auto
                     max-w-[360px]
                     text-[7px]
-                    leading-[1.25]
+                    leading-tight
                     text-muted-foreground
                     sm:text-[8px]
                     md:text-[9px]
                   "
                 >
-                  By signing up, you agree to receive updates from Alentah. You can unsubscribe at
-                  any time. See our Terms of Use and Privacy Policy for more information.
+                  By signing up, you agree to receive updates from Alentah.
                 </p>
               </div>
             </div>

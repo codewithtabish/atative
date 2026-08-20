@@ -123,6 +123,7 @@ export function PrivacyPolicy() {
           </div>
 
           {/* Table of Contents */}
+
           <nav
             aria-label="Privacy Policy contents"
             className="mb-16 rounded-2xl border border-border bg-muted/50 p-6 md:p-8"
@@ -133,7 +134,7 @@ export function PrivacyPolicy() {
                 <li key={section.id}>
                   <a
                     href={`#${section.id}`}
-                    className="group flex items-start gap-3 rounded-md p-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                    className="group flex items-start gap-3 rounded-md p-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline focus-visible:outline-primary"
                   >
                     <span className="mt-0.5 font-mono text-xs font-medium text-primary opacity-60 group-hover:opacity-100">
                       {section.number}
@@ -632,13 +633,13 @@ export function PrivacyPolicy() {
             <div className="mt-8 flex flex-wrap gap-3">
               <a
                 href="mailto:privacy@alentah.com"
-                className="inline-flex items-center justify-center rounded-lg bg-primary-foreground px-5 py-2.5 text-sm font-medium text-primary transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-foreground"
+                className="inline-flex items-center justify-center rounded-lg bg-primary-foreground px-5 py-2.5 text-sm font-medium text-primary transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-primary-foreground"
               >
                 Contact privacy team
               </a>
               <a
                 href="mailto:tabish@codewithtabish.com"
-                className="inline-flex items-center justify-center rounded-lg border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-foreground"
+                className="inline-flex items-center justify-center rounded-lg border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline focus-visible:outline-primary-foreground"
               >
                 General contact
               </a>
@@ -646,7 +647,7 @@ export function PrivacyPolicy() {
                 href="https://wa.me/923169000919"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-lg border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-foreground"
+                className="inline-flex items-center justify-center rounded-lg border border-primary-foreground/30 px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-foreground/10 focus-visible:outline-2 focus-visible:outline-primary-foreground"
               >
                 WhatsApp
               </a>
