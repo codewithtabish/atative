@@ -2,7 +2,7 @@ import { AdvertisePage } from "@/components/(app)/(pages)/advertise/advertise-pa
 
 import type { Metadata } from "next";
 
-const siteUrl = "https://atative.com";
+const siteUrl = "https://www.alentah.com";
 
 export const metadata: Metadata = {
   title: "Advertise with Alentah",

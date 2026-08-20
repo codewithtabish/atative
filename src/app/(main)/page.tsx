@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { HomePageComp } from "@/components/(app)/(pages)/homepage/home-page-comp";
 
-const siteUrl = "https://atative.com";
+const siteUrl = "https://www.alentah.com";
 
 export const metadata: Metadata = {
   title: "Alentah — Technology, AI, Science & More",

@@ -22,7 +22,7 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-const siteUrl = "https://atative.com";
+const siteUrl = "https://www.alentah.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -2,7 +2,7 @@ import { PrivacyPolicy } from "@/components/(app)/(pages)/privacy/privacy-policy
 
 import type { Metadata } from "next";
 
-const siteUrl = "https://atative.com";
+const siteUrl = "https://www.alentah.com";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Alentah",

@@ -12,7 +12,7 @@ type PageProps = {
   }>;
 };
 
-const siteUrl = "https://atative.com";
+const siteUrl = "https://www.alentah.com";
 
 const ogImage = `${siteUrl}/images/og/atative-og.png`;
 

@@ -2,7 +2,7 @@ import TermsPageComp from "@/components/(app)/(pages)/terms/terms-page-comp";
 
 import type { Metadata } from "next";
 
-const siteUrl = "https://atative.com";
+const siteUrl = "https://www.alentah.com";
 
 export const metadata: Metadata = {
   title: "Terms of Use | Alentah",
