@@ -117,48 +117,17 @@ export const metadata: Metadata = {
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${siteUrl}/#organization`,
-      name: "ATATIVE",
-      url: siteUrl,
-      logo: {
-        "@type": "ImageObject",
-        url: `${siteUrl}/images/favicons/web-app-manifest-512x512.png`,
-        width: 512,
-        height: 512,
-      },
-    },
-
-    {
-      "@type": "WebSite",
-      "@id": `${siteUrl}/#website`,
-      url: siteUrl,
-      name: "ATATIVE",
-      description:
-        "A modern digital publication covering technology, lifestyle, culture, entertainment, science, productivity, business, guides, reviews, and ideas.",
-      publisher: {
-        "@id": `${siteUrl}/#organization`,
-      },
-      inLanguage: "en-US",
-    },
-  ],
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
+      {/* <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
           }}
         />
-      </head>
+      </head> */}
 
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}

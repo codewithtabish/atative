@@ -20,6 +20,15 @@ export const metadata: Metadata = {
     title: "Alentah — Technology, AI, Science & More",
     description:
       "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
+
+    images: [
+      {
+        url: "/images/og/atative-og.png",
+        width: 1200,
+        height: 630,
+        alt: "ATATIVE — Ideas, Guides, Trends & Insights",
+      },
+    ],
   },
 
   twitter: {
@@ -27,6 +36,7 @@ export const metadata: Metadata = {
     title: "Alentah — Technology, AI, Science & More",
     description:
       "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
+    images: ["/images/og/atative-og.png"],
   },
 };
 
