@@ -54,6 +54,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
+        url: "/images/favicons/favicon.ico",
+        sizes: "any",
+      },
+      {
         url: "/images/favicons/favicon-96x96.png",
         type: "image/png",
         sizes: "96x96",
@@ -88,11 +92,10 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "Alentah",
-
-    title: "Alentah — Technology, AI, Science & More",
+    title: "Alentah — Tech, Business, Lifestyle, Culture & More",
 
     description:
-      "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
+      "Your daily guide to tech, AI, business, fashion, lifestyle, culture, productivity, and everything in between — news, guides, reviews, and ideas to help you live and work smarter.",
 
     images: [
       {
@@ -115,6 +118,7 @@ export const metadata: Metadata = {
     images: [`${siteUrl}/images/og/alentah-og.png`],
   },
 };
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>

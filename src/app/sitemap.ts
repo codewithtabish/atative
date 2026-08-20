@@ -92,6 +92,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     {
+      url: `${siteUrl}/contact`,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
       url: `${siteUrl}/advertise`,
       changeFrequency: "monthly",
       priority: 0.5,
