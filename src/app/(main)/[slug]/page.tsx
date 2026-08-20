@@ -4,7 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getTopCategoryPageBlogsAction } from "@/app/actions/(category)/get-top-category-blogs-action";
-
 import { CategoryBlogComponent } from "@/components/(app)/(pages)/categorypage/category-blog-comp";
 
 type PageProps = {
@@ -13,25 +12,18 @@ type PageProps = {
   }>;
 };
 
-const siteUrl = "https://www.alentah.com";
+const siteUrl = "https://atative.com";
 
-/**
- * ============================================================
- * SEO METADATA
- * ============================================================
- */
+const ogImage = `${siteUrl}/images/og/atative-og.png`;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
 
   const result = await getTopCategoryPageBlogsAction(slug);
 
-  /**
-   * If the category doesn't exist, don't index this URL.
-   */
   if (!result.success) {
     return {
-      title: "Category Not Found | Alentah",
+      title: "Category Not Found | ATATIVE",
       robots: {
         index: false,
         follow: false,
@@ -42,74 +34,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const category = result.data;
 
   const categoryName = category.name;
-  const categorySlug = category.slug;
 
-  /**
-   * Use the database description when available.
-   * Otherwise generate a useful fallback.
-   */
   const description =
     category.description?.trim() ||
-    `Explore the latest ${categoryName.toLowerCase()} news, guides, trends, tools, analysis, and insights on Alentah.`;
+    `Explore the latest ${categoryName.toLowerCase()} news, guides, trends, tools, analysis, and insights on ATATIVE.`;
 
-  /**
-   * Page title.
-   *
-   * Examples:
-   *
-   * AI | Alentah
-   * Technology | Alentah
-   * Robotics | Alentah
-   */
-  const title = `${categoryName} | Alentah`;
+  const title = `${categoryName} | ATATIVE`;
 
-  /**
-   * Absolute canonical URL.
-   *
-   * https://www.alentah.com/ai
-   */
-  const canonicalUrl = `${siteUrl}/${categorySlug}`;
-
-  /**
-   * Shared Alentah social image.
-   *
-   * Ideally create a 1200 × 630 Alentah OG image.
-   */
-  const ogImage = `${siteUrl}/images/og/alentah-og.png`;
+  const canonicalUrl = `${siteUrl}/${category.slug}`;
 
   return {
-    /**
-     * ========================================================
-     * BASIC SEO
-     * ========================================================
-     */
-
-    title,
-
-    description,
-
     metadataBase: new URL(siteUrl),
 
-    /**
-     * ========================================================
-     * CANONICAL
-     * ========================================================
-     */
+    title,
+    description,
 
     alternates: {
       canonical: canonicalUrl,
     },
 
-    /**
-     * ========================================================
-     * ROBOTS
-     * ========================================================
-     */
-
     robots: {
       index: true,
       follow: true,
-
       googleBot: {
         index: true,
         follow: true,
@@ -119,23 +65,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
 
-    /**
-     * ========================================================
-     * OPEN GRAPH
-     * ========================================================
-     */
-
     openGraph: {
       type: "website",
-
       locale: "en_US",
-
       url: canonicalUrl,
-
-      siteName: "Alentah",
-
+      siteName: "ATATIVE",
       title,
-
       description,
 
       images: [
@@ -143,45 +78,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: `${categoryName} | Alentah`,
+          alt: `${categoryName} | ATATIVE`,
         },
       ],
     },
 
-    /**
-     * ========================================================
-     * TWITTER / X
-     * ========================================================
-     */
-
     twitter: {
       card: "summary_large_image",
-
       title,
-
       description,
-
       images: [ogImage],
     },
   };
 }
 
-/**
- * ============================================================
- * CATEGORY PAGE
- * ============================================================
- */
-
 export default async function CategorySlug({ params }: PageProps) {
   const { slug } = await params;
 
   const result = await getTopCategoryPageBlogsAction(slug);
-
-  /**
-   * ==========================================================
-   * NOT FOUND
-   * ==========================================================
-   */
 
   if (!result.success) {
     notFound();
@@ -191,37 +105,23 @@ export default async function CategorySlug({ params }: PageProps) {
 
   return (
     <main>
-      {/* =====================================================
-            BREADCRUMB
-        ===================================================== */}
-
       <nav aria-label="Breadcrumb" className="pt-8 sm:pt-10">
         <ol className="flex items-center gap-2 font-sans text-[18px] font-medium">
-          {/* Home */}
-
           <li>
             <Link href="/" className="text-foreground transition-colors hover:text-primary">
               Home
             </Link>
           </li>
 
-          {/* Arrow */}
-
           <li aria-hidden="true" className="text-muted-foreground">
             <ChevronRight className="size-5" />
           </li>
-
-          {/* Current Category */}
 
           <li aria-current="page" className="text-primary">
             {category.name}
           </li>
         </ol>
       </nav>
-
-      {/* =====================================================
-            CATEGORY CONTENT
-        ===================================================== */}
 
       <section className="pb-12 pt-10 sm:pb-16 sm:pt-12">
         <CategoryBlogComponent category={category} />

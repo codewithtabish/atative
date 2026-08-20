@@ -13,16 +13,30 @@ type PageProps = {
   }>;
 };
 
-const siteUrl = "https://www.alentah.com";
+const siteUrl = "https://atative.com";
+
+const ogImage = `${siteUrl}/images/og/atative-og.png`;
+
+/**
+ * ============================================================
+ * DYNAMIC SUBCATEGORY SEO METADATA
+ * ============================================================
+ */
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug: categorySlug, subcategory: subcategorySlug } = await params;
 
   const result = await getSubcategoryPageBlogsAction(subcategorySlug);
 
+  /**
+   * ==========================================================
+   * SUBCATEGORY NOT FOUND
+   * ==========================================================
+   */
+
   if (!result.success) {
     return {
-      title: "Subcategory Not Found",
+      title: "Subcategory Not Found | ATATIVE",
       robots: {
         index: false,
         follow: false,
@@ -35,25 +49,65 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const categoryName = subcategory.category.name;
   const subcategoryName = subcategory.name;
 
+  /**
+   * ==========================================================
+   * DYNAMIC TITLE
+   * ==========================================================
+   */
+
   const title = `${subcategoryName} — Latest News, Guides & Insights`;
 
+  /**
+   * ==========================================================
+   * DYNAMIC DESCRIPTION
+   *
+   * Prefer the description stored in the database.
+   * If there is no description, generate one automatically.
+   * ==========================================================
+   */
+
   const description =
-    subcategory.description ||
-    `Explore the latest ${subcategoryName} news, guides, analysis, reviews, and insights from ${categoryName} on Alentah.`;
+    subcategory.description?.trim() ||
+    `Explore the latest ${subcategoryName.toLowerCase()} news, guides, analysis, reviews, and insights from ${categoryName} on ATATIVE.`;
+
+  /**
+   * ==========================================================
+   * DYNAMIC CANONICAL URL
+   *
+   * Example:
+   * https://atative.com/ai/generative-ai
+   * ==========================================================
+   */
 
   const canonicalUrl = `${siteUrl}/${categorySlug}/${subcategorySlug}`;
 
-  const ogImage = subcategory.blogs[0]?.bannerImage || "/images/og/alentah-og.png";
-
   return {
+    /**
+     * ========================================================
+     * BASIC SEO
+     * ========================================================
+     */
+
+    metadataBase: new URL(siteUrl),
+
     title,
     description,
 
-    metadataBase: new URL(siteUrl),
+    /**
+     * ========================================================
+     * CANONICAL
+     * ========================================================
+     */
 
     alternates: {
       canonical: canonicalUrl,
     },
+
+    /**
+     * ========================================================
+     * ROBOTS
+     * ========================================================
+     */
 
     robots: {
       index: true,
@@ -68,14 +122,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
 
+    /**
+     * ========================================================
+     * OPEN GRAPH
+     * ========================================================
+     */
+
     openGraph: {
       type: "website",
       locale: "en_US",
       url: canonicalUrl,
-      siteName: "Alentah",
+      siteName: "ATATIVE",
 
       title,
-
       description,
 
       images: [
@@ -83,32 +142,41 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: `${subcategoryName} — Alentah`,
+          alt: `${subcategoryName} | ATATIVE`,
         },
       ],
     },
 
+    /**
+     * ========================================================
+     * TWITTER / X
+     * ========================================================
+     */
+
     twitter: {
       card: "summary_large_image",
-
       title,
-
       description,
-
       images: [ogImage],
     },
   };
 }
 
+/**
+ * ============================================================
+ * SUBCATEGORY PAGE
+ * ============================================================
+ */
+
 export default async function SubcategoryPage({ params }: PageProps) {
   const { slug: categorySlug, subcategory: subcategorySlug } = await params;
 
-  /*
-   * Validate the subcategory before rendering.
-   *
-   * This prevents an invalid URL from rendering
-   * an empty subcategory page.
+  /**
+   * ==========================================================
+   * VALIDATE SUBCATEGORY
+   * ==========================================================
    */
+
   const result = await getSubcategoryPageBlogsAction(subcategorySlug);
 
   if (!result.success) {

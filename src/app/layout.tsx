@@ -28,24 +28,24 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
 
   title: {
-    default: "ATATIVE — Ideas, Guides, Trends & Insights",
-    template: "%s | ATATIVE",
+    default: "Alentah — Technology, AI, Science & More",
+    template: "%s | Alentah",
   },
 
   description:
-    "ATATIVE is a modern digital publication covering technology, lifestyle, culture, entertainment, science, productivity, business, guides, reviews, and the ideas shaping everyday life.",
+    "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
 
-  applicationName: "ATATIVE",
+  applicationName: "Alentah",
 
   authors: [
     {
-      name: "ATATIVE",
+      name: "Alentah",
       url: siteUrl,
     },
   ],
 
-  creator: "ATATIVE",
-  publisher: "ATATIVE",
+  creator: "Alentah",
+  publisher: "Alentah",
 
   alternates: {
     canonical: "/",
@@ -59,7 +59,6 @@ export const metadata: Metadata = {
         sizes: "96x96",
       },
     ],
-
     apple: [
       {
         url: "/images/favicons/apple-touch-icon.png",
@@ -88,19 +87,19 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "ATATIVE",
+    siteName: "Alentah",
 
-    title: "ATATIVE — Ideas, Guides, Trends & Insights",
+    title: "Alentah — Technology, AI, Science & More",
 
     description:
-      "ATATIVE is a modern digital publication covering technology, lifestyle, culture, entertainment, science, productivity, business, guides, reviews, and the ideas shaping everyday life.",
+      "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
 
     images: [
       {
-        url: "/images/og/atative-og.png",
+        url: `${siteUrl}/images/og/alentah-og.png`,
         width: 1200,
         height: 630,
-        alt: "ATATIVE — Ideas, Guides, Trends & Insights",
+        alt: "Alentah — Technology, AI, Science & More",
       },
     ],
   },
@@ -108,15 +107,14 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
 
-    title: "ATATIVE — Ideas, Guides, Trends & Insights",
+    title: "Alentah — Technology, AI, Science & More",
 
     description:
-      "ATATIVE is a modern digital publication covering technology, lifestyle, culture, entertainment, science, productivity, business, guides, reviews, and the ideas shaping everyday life.",
+      "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
 
-    images: ["/images/og/atative-og.png"],
+    images: [`${siteUrl}/images/og/alentah-og.png`],
   },
 };
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
