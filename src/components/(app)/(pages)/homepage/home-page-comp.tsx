@@ -59,8 +59,16 @@ function getAuthorInitials(author: HomeBlogListItem["author"]): string {
     .join("");
 }
 
-function getArticleUrl(slug: string): string {
-  return `/blogs/${slug}`;
+/**
+ * Canonical blog URL:
+ *
+ * /category-slug/subcategory-slug/blog-slug
+ *
+ * Example:
+ * /ai/generative-ai/generative-ai-architecture-a-complete-guide-to-building-modern-ai-systems
+ */
+function getArticleUrl(blog: HomeBlogListItem): string {
+  return `/${blog.category.slug}/${blog.subcategory.slug}/${blog.slug}`;
 }
 
 function getCategoryUrl(slug: string): string {
@@ -171,7 +179,7 @@ function ByLine({
 }
 
 /* -------------------------------------------------------------------------- */
-/* Hero — lead story + Latest rail                                            */
+/* Hero — lead story + Latest rail                                           */
 /* -------------------------------------------------------------------------- */
 
 function HeroSection({ hero, latest }: { hero: HomeBlogListItem; latest: HomeBlogListItem[] }) {
@@ -182,7 +190,7 @@ function HeroSection({ hero, latest }: { hero: HomeBlogListItem; latest: HomeBlo
       </h1>
 
       <article className="group lg:col-span-2">
-        <Link href={getArticleUrl(hero.slug)} className="block">
+        <Link href={getArticleUrl(hero)} className="block">
           <div className="relative aspect-16/10 w-full overflow-hidden rounded-lg bg-muted">
             <Image
               src={hero.bannerImage}
@@ -198,7 +206,7 @@ function HeroSection({ hero, latest }: { hero: HomeBlogListItem; latest: HomeBlo
         <div className="mt-4 space-y-3">
           <Eyebrow label={hero.category.name} href={getCategoryUrl(hero.category.slug)} />
 
-          <Link href={getArticleUrl(hero.slug)}>
+          <Link href={getArticleUrl(hero)}>
             <h2 className="text-3xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary md:text-4xl">
               {hero.title}
             </h2>
@@ -232,7 +240,7 @@ function HeroSection({ hero, latest }: { hero: HomeBlogListItem; latest: HomeBlo
                     className="text-[11px]"
                   />
 
-                  <Link href={getArticleUrl(blog.slug)}>
+                  <Link href={getArticleUrl(blog)}>
                     <h3 className="line-clamp-3 text-sm font-semibold leading-snug transition-colors group-hover:text-primary">
                       {blog.title}
                     </h3>
@@ -244,7 +252,7 @@ function HeroSection({ hero, latest }: { hero: HomeBlogListItem; latest: HomeBlo
                 </div>
 
                 <Link
-                  href={getArticleUrl(blog.slug)}
+                  href={getArticleUrl(blog)}
                   className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted"
                   aria-label={blog.title}
                 >
@@ -283,7 +291,7 @@ function TrendingSection({ items }: { items: HomeBlogListItem[] }) {
       <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
         {items.map((blog) => (
           <article key={blog.id} className="group">
-            <Link href={getArticleUrl(blog.slug)} className="block" aria-label={blog.title}>
+            <Link href={getArticleUrl(blog)} className="block" aria-label={blog.title}>
               <div className="relative aspect-4/3 w-full overflow-hidden rounded-md bg-muted">
                 <Image
                   src={blog.bannerImage}
@@ -302,7 +310,7 @@ function TrendingSection({ items }: { items: HomeBlogListItem[] }) {
                 className="text-[11px]"
               />
 
-              <Link href={getArticleUrl(blog.slug)}>
+              <Link href={getArticleUrl(blog)}>
                 <h3 className="line-clamp-2 text-sm font-semibold leading-snug transition-colors group-hover:text-primary">
                   {blog.title}
                 </h3>
@@ -339,7 +347,7 @@ function FeaturedSection({
       <Separator className="mt-3" />
 
       <article className="group mt-6">
-        <Link href={getArticleUrl(feature.slug)} className="block" aria-label={feature.title}>
+        <Link href={getArticleUrl(feature)} className="block" aria-label={feature.title}>
           <div className="relative aspect-21/9 w-full overflow-hidden rounded-lg bg-muted">
             <Image
               src={feature.bannerImage}
@@ -354,7 +362,7 @@ function FeaturedSection({
         <div className="mt-4 space-y-2">
           <Eyebrow label={feature.category.name} href={getCategoryUrl(feature.category.slug)} />
 
-          <Link href={getArticleUrl(feature.slug)}>
+          <Link href={getArticleUrl(feature)}>
             <h3 className="text-2xl font-bold leading-tight transition-colors group-hover:text-primary">
               {feature.title}
             </h3>
@@ -375,7 +383,7 @@ function FeaturedSection({
                   className="text-[11px]"
                 />
 
-                <Link href={getArticleUrl(blog.slug)}>
+                <Link href={getArticleUrl(blog)}>
                   <h4 className="line-clamp-2 text-base font-semibold leading-snug transition-colors group-hover:text-primary">
                     {blog.title}
                   </h4>
@@ -392,7 +400,7 @@ function FeaturedSection({
 }
 
 /* -------------------------------------------------------------------------- */
-/* Editorial section                                                           */
+/* Editorial section                                                          */
 /* -------------------------------------------------------------------------- */
 
 function EditorialSection({
@@ -417,7 +425,7 @@ function EditorialSection({
 
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
         <article className="group lg:col-span-2">
-          <Link href={getArticleUrl(feature.slug)} className="block" aria-label={feature.title}>
+          <Link href={getArticleUrl(feature)} className="block" aria-label={feature.title}>
             <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
               <Image
                 src={feature.bannerImage}
@@ -432,7 +440,7 @@ function EditorialSection({
           <div className="mt-4 space-y-2">
             <Eyebrow label={feature.category.name} href={getCategoryUrl(feature.category.slug)} />
 
-            <Link href={getArticleUrl(feature.slug)}>
+            <Link href={getArticleUrl(feature)}>
               <h3 className="text-2xl font-bold leading-tight transition-colors group-hover:text-primary">
                 {feature.title}
               </h3>
@@ -453,7 +461,7 @@ function EditorialSection({
                     className="text-[11px]"
                   />
 
-                  <Link href={getArticleUrl(blog.slug)}>
+                  <Link href={getArticleUrl(blog)}>
                     <h4 className="line-clamp-2 text-sm font-semibold leading-snug transition-colors group-hover:text-primary">
                       {blog.title}
                     </h4>
@@ -474,7 +482,7 @@ function EditorialSection({
 }
 
 /* -------------------------------------------------------------------------- */
-/* More stories                                                               */
+/* More stories                                                                */
 /* -------------------------------------------------------------------------- */
 
 function MoreStoriesSection({ items }: { items: HomeBlogListItem[] }) {
@@ -491,7 +499,7 @@ function MoreStoriesSection({ items }: { items: HomeBlogListItem[] }) {
       <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((blog) => (
           <article key={blog.id} className="group">
-            <Link href={getArticleUrl(blog.slug)} className="block" aria-label={blog.title}>
+            <Link href={getArticleUrl(blog)} className="block" aria-label={blog.title}>
               <div className="relative aspect-video w-full overflow-hidden rounded-md bg-muted">
                 <Image
                   src={blog.bannerImage}
@@ -510,7 +518,7 @@ function MoreStoriesSection({ items }: { items: HomeBlogListItem[] }) {
                 className="text-[11px]"
               />
 
-              <Link href={getArticleUrl(blog.slug)}>
+              <Link href={getArticleUrl(blog)}>
                 <h3 className="line-clamp-2 text-base font-semibold leading-snug transition-colors group-hover:text-primary">
                   {blog.title}
                 </h3>
@@ -678,7 +686,7 @@ async function HomeFeed() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Homepage                                                                   */
+/* Homepage                                                                    */
 /* -------------------------------------------------------------------------- */
 
 export function HomePageComp() {
