@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 
 const HomeScreen = () => {
   return (
-    <Container>
+    <Container className="">
       <HomePageComp />
     </Container>
   );

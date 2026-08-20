@@ -11,7 +11,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-import { Container } from "../../(common)/layout/container";
 import { HomeFeedSkeleton } from "./home-feed-skeleton";
 import { MissionVisionSection } from "./mission-vision-section";
 import TheDaily from "./the-daily";
@@ -684,7 +683,7 @@ async function HomeFeed() {
 
 export function HomePageComp() {
   return (
-    <Container className="space-y-16 py-10 md:space-y-20 md:py-14">
+    <div className="space-y-16 py-10 md:space-y-20 md:py-14">
       <Suspense fallback={<HomeFeedSkeleton />}>
         <HomeFeed />
       </Suspense>
@@ -692,6 +691,6 @@ export function HomePageComp() {
       <TheDaily />
 
       <MissionVisionSection />
-    </Container>
+    </div>
   );
 }

@@ -88,7 +88,7 @@ export function PrivacyPolicy() {
   return (
     <Container>
       <main className="pb-20 pt-16 md:pb-28 md:pt-24">
-        <article className="mx-auto max-w-3xl">
+        <article className="mx-auto max-w-4xl">
           {/* Hero */}
           <header className="mb-16">
             <span className="mb-4 block text-sm font-medium uppercase tracking-wider text-primary">
