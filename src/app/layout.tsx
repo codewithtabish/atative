@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 
 import { ThemeProvider } from "@/components/(app)/(common)/theme/theme-provider";
 import ExitIntentPopup from "@/components/(app)/(pages)/newsletter/exit-intent-popup";
-
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import { Toaster } from "sonner";
-
 import "./globals.css";
 
 const fontSans = Geist({
@@ -149,6 +148,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
 
             <Toaster />
+            <Analytics />
           </ThemeProvider>
         </ClerkProvider>
       </body>
