@@ -51,29 +51,6 @@ export const metadata: Metadata = {
     canonical: "/",
   },
 
-  icons: {
-    icon: [
-      {
-        url: "/images/favicons/favicon.ico",
-        sizes: "any",
-      },
-      {
-        url: "/images/favicons/favicon-96x96.png",
-        type: "image/png",
-        sizes: "96x96",
-      },
-    ],
-    apple: [
-      {
-        url: "/images/favicons/apple-touch-icon.png",
-        type: "image/png",
-        sizes: "180x180",
-      },
-    ],
-  },
-
-  manifest: "/images/favicons/site.webmanifest",
-
   robots: {
     index: true,
     follow: true,
@@ -87,19 +64,44 @@ export const metadata: Metadata = {
     },
   },
 
+  icons: {
+    icon: [
+      {
+        url: "/images/favicons/favicon.ico",
+        sizes: "any",
+      },
+      {
+        url: "/images/favicons/favicon-96x96.png",
+        type: "image/png",
+        sizes: "96x96",
+      },
+    ],
+
+    apple: [
+      {
+        url: "/images/favicons/apple-touch-icon.png",
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
+  },
+
+  manifest: "/images/favicons/site.webmanifest",
+
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteUrl,
     siteName: "Alentah",
-    title: "Alentah — Tech, Business, Lifestyle, Culture & More",
+
+    title: "Alentah — Technology, AI, Science & More",
 
     description:
-      "Your daily guide to tech, AI, business, fashion, lifestyle, culture, productivity, and everything in between — news, guides, reviews, and ideas to help you live and work smarter.",
+      "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
 
     images: [
       {
-        url: `${siteUrl}/images/og/alentah-og.png`,
+        url: "/images/og/alentah-og.png",
         width: 1200,
         height: 630,
         alt: "Alentah — Technology, AI, Science & More",
@@ -115,7 +117,7 @@ export const metadata: Metadata = {
     description:
       "Explore the latest news, insights, guides, reviews, and ideas across technology, artificial intelligence, science, software, robotics, productivity, business, culture, and emerging trends.",
 
-    images: [`${siteUrl}/images/og/alentah-og.png`],
+    images: ["/images/og/alentah-og.png"],
   },
 };
 
