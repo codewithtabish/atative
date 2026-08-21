@@ -1,11 +1,13 @@
-import { ThemeProvider } from "@/components/(app)/(common)/theme/theme-provider";
 import type { Metadata } from "next";
-import "./globals.css";
 
+import { ThemeProvider } from "@/components/(app)/(common)/theme/theme-provider";
 import ExitIntentPopup from "@/components/(app)/(pages)/newsletter/exit-intent-popup";
+
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import { Toaster } from "sonner";
+
+import "./globals.css";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -124,14 +126,13 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* <head>
+      <head>
         <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-          }}
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8266173033916275"
+          crossOrigin="anonymous"
         />
-      </head> */}
+      </head>
 
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontMono.variable} antialiased`}
@@ -144,9 +145,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             disableTransitionOnChange
           >
             <ExitIntentPopup />
+
             {children}
+
             <Toaster />
-            {/* ✅ Add Exit Intent Popup here */}
           </ThemeProvider>
         </ClerkProvider>
       </body>
